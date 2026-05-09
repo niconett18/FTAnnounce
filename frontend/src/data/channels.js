@@ -29,4 +29,18 @@ export const channelCategories = [
       { id: "krs-perwalian", label: "KRS & Perwalian" },
     ],
   },
+
+{
+    name: "Magazine Archive",
+    channels: [
+      { id: "eim", label: "Electrical Issue Magazine" },
+      { id: "chemical-archive", label: "Chemical Engineering Archive" },
+      { id: "ism", label: "Industrial - Issue Media" },
+      { id: "gardisun", label: "Gardisun FTUI" },
+      { id: "tb-mechanical", label: "TB Mechanical" },
+      { id: "intervoice", label: "Intervoice IMPI" },
+      { id: "archetype", label: "Archetype Online Magazine" },
+    ],
+  },
+  
 ];
