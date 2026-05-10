@@ -38,7 +38,7 @@ export const channelCategories = [
       { id: "ism", label: "Industrial Issue Media" },
       { id: "gardisun", label: "Gardisun FTUI" },
       { id: "tb-mechanical", label: "TB Mechanical" },
-      { id: "intervoice", label: "Intervoice IMPI" },
+      { id: "intervoice", label: "Intervoice" },
       { id: "archetype", label: "Archetype Online Magazine" },
       { id: "civilrights", label: "Civil Rights"},
     ],
