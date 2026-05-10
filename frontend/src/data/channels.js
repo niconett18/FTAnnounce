@@ -35,11 +35,12 @@ export const channelCategories = [
     channels: [
       { id: "eim", label: "Electrical Issue Magazine" },
       { id: "chemical-archive", label: "Chemical Engineering Archive" },
-      { id: "ism", label: "Industrial - Issue Media" },
+      { id: "ism", label: "Industrial Issue Media" },
       { id: "gardisun", label: "Gardisun FTUI" },
       { id: "tb-mechanical", label: "TB Mechanical" },
       { id: "intervoice", label: "Intervoice IMPI" },
       { id: "archetype", label: "Archetype Online Magazine" },
+      { id: "civilrights", label: "Civil Rights"},
     ],
   },
   
