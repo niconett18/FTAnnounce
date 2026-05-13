@@ -1,77 +1,86 @@
 import {
-  Eye,
-  EyeOff,
-  Check,
   Paperclip,
   AlertTriangle,
   Info,
   Bell,
+  Pin,
 } from "lucide-react";
 
 const priorityConfig = {
-  urgent: {
-    label: "Urgent",
-    className:
-      "bg-white dark:bg-navy-800 text-primary border-glass shadow-sm",
+  darurat: {
+    label: "Darurat",
+    className: "bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/30 shadow-sm",
     icon: AlertTriangle,
   },
   penting: {
     label: "Penting",
-    className:
-      "bg-white dark:bg-navy-800 text-primary border-glass shadow-sm",
+    className: "bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30 shadow-sm",
     icon: Bell,
   },
   info: {
-    label: "Info",
-    className:
-      "bg-white dark:bg-navy-800 text-secondary border-glass shadow-sm",
+    label: "Informasi",
+    className: "bg-sky-50 dark:bg-sky-500/15 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-500/30 shadow-sm",
     icon: Info,
   },
 };
 
-function formatDate(dateStr) {
+function formatAbsoluteDate(dateStr) {
   const date = new Date(dateStr);
-  const now = new Date();
-  const diff = now - date;
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(hours / 24);
-
-  if (hours < 1) return "Baru saja";
-  if (hours < 24) return `${hours} jam lalu`;
-  if (days === 1) return "Kemarin";
-  if (days < 7) return `${days} hari lalu`;
-
-  return date.toLocaleDateString("id-ID", {
+  return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
-    month: "short",
+    month: "long",
     year: "numeric",
-  });
-}
-
-function formatTime(dateStr) {
-  return new Date(dateStr).toLocaleTimeString("id-ID", {
     hour: "2-digit",
     minute: "2-digit",
-  });
+    timeZoneName: "short",
+  }).format(date);
 }
 
-export default function AnnouncementCard({ announcement }) {
+function isPinActive(pinUntil) {
+  if (!pinUntil) return false;
+  return new Date(pinUntil) > new Date();
+}
+
+export default function AnnouncementCard({ announcement, compact = false }) {
   const {
     author,
-    role,
+    authorRole,
+    authorAccountType,
     date,
     priority,
     title,
     content,
-    isRead,
     attachments,
+    pinUntil,
   } = announcement;
 
-  const badge = priorityConfig[priority];
+  const pinned = isPinActive(pinUntil);
+  const badge = priorityConfig[priority] || priorityConfig.info;
   const BadgeIcon = badge.icon;
 
+  // Mode compact: hanya judul + pin icon (untuk collapsed pinned section)
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2 px-3 py-2 text-[13px] cursor-pointer hover:bg-navy-100/50 dark:hover:bg-white/5 rounded-lg transition-all">
+        <Pin size={12} className="text-navy-500 dark:text-navy-400 shrink-0" />
+        <span className="text-primary font-medium truncate">{title}</span>
+        <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full border shrink-0 ${badge.className}`}>
+          {badge.label}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <article className="glass-card rounded-[24px] p-5 cursor-pointer active:scale-[0.98] apple-spring hover:shadow-lg animate-slide-up group">
+    <article className={`glass-card rounded-[24px] p-5 apple-spring hover:shadow-lg animate-slide-up group ${pinned ? 'border-l-4 border-l-navy-500 dark:border-l-navy-400' : ''}`}>
+      {/* Pin indicator */}
+      {pinned && (
+        <div className="flex items-center gap-1.5 mb-3 text-[11px] text-navy-500 dark:text-navy-400 font-semibold">
+          <Pin size={12} />
+          Disematkan
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-3 mb-3.5">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 rounded-full bg-navy-50 border border-navy-200 text-navy-700 dark:bg-navy-700 dark:border-navy-600 dark:text-white flex items-center justify-center text-[11px] font-bold shrink-0">
@@ -86,13 +95,13 @@ export default function AnnouncementCard({ announcement }) {
             <p className="text-[13px] font-semibold text-primary truncate">
               {author}
             </p>
-            <div className="flex items-center gap-1.5 text-[11px] text-tertiary">
-              <span className="text-secondary font-medium">{role}</span>
-              <span className="opacity-40">·</span>
-              <span title={new Date(date).toLocaleString("id-ID")}>
-                {formatDate(date)}, {formatTime(date)}
-              </span>
-            </div>
+            {/* Personal account: tampilkan role di bawah nama */}
+            {authorAccountType === 'personal' && authorRole && (
+              <p className="text-[11px] text-tertiary truncate">{authorRole}</p>
+            )}
+            <p className="text-[11px] text-tertiary">
+              {formatAbsoluteDate(date)}
+            </p>
           </div>
         </div>
 
@@ -113,32 +122,30 @@ export default function AnnouncementCard({ announcement }) {
       </p>
 
       {attachments && attachments.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {attachments.map((file, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] text-secondary bg-white border border-glass hover:bg-navy-50 dark:bg-navy-800 dark:hover:bg-navy-700 rounded-lg transition-all cursor-pointer shadow-sm"
-            >
-              <Paperclip size={11} strokeWidth={2} />
-              {file}
-            </span>
-          ))}
+        <div className="flex flex-wrap gap-1.5">
+          {attachments.map((file, i) => {
+            const isUrl = file.startsWith('http://') || file.startsWith('https://');
+            const chipClass = "inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] text-secondary bg-white border border-glass dark:bg-navy-800 rounded-lg shadow-sm";
+            return isUrl ? (
+              <a
+                key={i}
+                href={file}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${chipClass} hover:bg-navy-50 dark:hover:bg-navy-700 hover:text-navy-600 dark:hover:text-navy-300 transition-all cursor-pointer`}
+              >
+                <Paperclip size={11} strokeWidth={2} />
+                {file.split('/').pop() || file}
+              </a>
+            ) : (
+              <span key={i} className={chipClass}>
+                <Paperclip size={11} strokeWidth={2} />
+                {file}
+              </span>
+            );
+          })}
         </div>
       )}
-
-      <div className="flex items-center justify-end pt-3 border-t border-navy-100/60 dark:border-white/10">
-        {isRead ? (
-          <span className="inline-flex items-center gap-1 text-[11px] text-primary font-medium">
-            <Check size={13} strokeWidth={2.5} />
-            Dibaca
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 text-[11px] text-tertiary">
-            <EyeOff size={13} strokeWidth={1.8} />
-            Belum dibaca
-          </span>
-        )}
-      </div>
     </article>
   );
 }

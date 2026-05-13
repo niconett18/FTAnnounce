@@ -1,52 +1,79 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Menu, LogOut } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import Feed from "./components/Feed";
 import Login from "./pages/Login";
-import Admin from "./pages/Admin";
-import { announcements as initialAnnouncements } from "./data/announcements";
+import { fetchAnnouncements, setLogoutCallback } from "./api";
 
-export default function App() {
-  const [currentView, setCurrentView] = useState("feed"); // feed, login, admin
-  const [user, setUser] = useState(null); // { role, name, dept }
-  
-  const [activeChannel, setActiveChannel] = useState("dtm");
+function ProtectedRoute({ user, children }) {
+  if (!user) {
+    return <Navigate to="/loginAdmin" replace />;
+  }
+  return children;
+}
+
+function MainLayout({ isAdmin, user, token, onLogout, onProfileUpdate }) {
+  const navigate = useNavigate();
+  const [activeChannel, setActiveChannel] = useState("dts");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [announcements, setAnnouncements] = useState(initialAnnouncements);
+  const [announcements, setAnnouncements] = useState({});
+  const [loadingChannel, setLoadingChannel] = useState(false);
+  const [hasMore, setHasMore] = useState({});
+  const [lastTimestamps, setLastTimestamps] = useState({});
 
-  const handleLogin = (userData) => {
-    setUser(userData);
-    if (userData.role === "admin") {
-      setCurrentView("admin");
+  useEffect(() => {
+    if (announcements[activeChannel]) return;
+
+    setLoadingChannel(true);
+    fetchAnnouncements(activeChannel)
+      .then(result => {
+        setAnnouncements(prev => ({ ...prev, [activeChannel]: result.announcements }));
+        setHasMore(prev => ({ ...prev, [activeChannel]: !!result.nextTimestamp }));
+        setLastTimestamps(prev => ({ ...prev, [activeChannel]: result.nextTimestamp }));
+      })
+      .catch(err => {
+        console.error('Gagal fetch pengumuman:', err);
+      })
+      .finally(() => setLoadingChannel(false));
+  }, [activeChannel]);
+
+  const loadMore = async () => {
+    if (!hasMore[activeChannel] || loadingChannel) return;
+    const currentLast = lastTimestamps[activeChannel];
+    if (!currentLast) return;
+
+    setLoadingChannel(true);
+    try {
+      const result = await fetchAnnouncements(activeChannel, currentLast);
+      setAnnouncements(prev => ({
+        ...prev,
+        [activeChannel]: [...(prev[activeChannel] || []), ...result.announcements]
+      }));
+      setHasMore(prev => ({ ...prev, [activeChannel]: !!result.nextTimestamp }));
+      setLastTimestamps(prev => ({ ...prev, [activeChannel]: result.nextTimestamp }));
+    } catch (err) {
+      console.error('Gagal load more:', err);
+    } finally {
+      setLoadingChannel(false);
     }
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setCurrentView("login");
-  };
-
   const handleAddAnnouncement = (channelId, newAnnouncement) => {
-    setAnnouncements(prev => {
-      const channelItems = prev[channelId] || [];
-      return {
-        ...prev,
-        [channelId]: [newAnnouncement, ...channelItems]
-      };
-    });
+    setAnnouncements(prev => ({
+      ...prev,
+      [channelId]: [newAnnouncement, ...(prev[channelId] || [])]
+    }));
   };
 
   const handleChannelSelect = (channelId) => {
     setActiveChannel(channelId);
-    
-    // Mark all announcements in the channel as read
-    if (announcements[channelId]) {
-      setAnnouncements(prev => ({
-        ...prev,
-        [channelId]: prev[channelId].map(a => ({ ...a, isRead: true }))
-      }));
-    }
+  };
+
+  const handleLogout = () => {
+    onLogout();
+    navigate("/");
   };
 
   useEffect(() => {
@@ -57,16 +84,6 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // Routing Logic
-  if (currentView === "login") {
-    return <Login onLogin={handleLogin} onNavigate={setCurrentView} />;
-  }
-
-  if (currentView === "admin") {
-    return <Admin onLogout={handleLogout} onAddAnnouncement={handleAddAnnouncement} />;
-  }
-
-  // Main Feed View
   return (
     <div className="h-full flex transition-colors duration-300">
       <Sidebar
@@ -74,10 +91,10 @@ export default function App() {
         onChannelSelect={handleChannelSelect}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        announcements={announcements}
-        user={user}
+        user={isAdmin ? user : null}
+        token={token}
         onLogout={handleLogout}
-        onNavigateToLogin={() => setCurrentView("login")}
+        onProfileUpdate={onProfileUpdate}
       />
 
       <div className="flex-1 flex flex-col min-w-0 relative">
@@ -93,18 +110,70 @@ export default function App() {
               FTAnnounce
             </span>
           </div>
-          <button onClick={handleLogout} className="p-2 -mr-2 text-red-500 hover:bg-red-500/10 rounded-lg">
-             <LogOut size={16} />
-          </button>
+          {isAdmin && user && (
+            <button onClick={handleLogout} className="p-2 -mr-2 text-red-500 hover:bg-red-500/10 rounded-lg">
+              <LogOut size={16} />
+            </button>
+          )}
         </div>
 
-        <Feed 
+        <Feed
           activeChannel={activeChannel}
           isDarkMode={isDarkMode}
           toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
           announcements={announcements}
+          loading={loadingChannel}
+          hasMore={hasMore[activeChannel]}
+          onLoadMore={loadMore}
+          isAdmin={isAdmin}
+          user={user}
+          token={token}
+          onPostSuccess={handleAddAnnouncement}
         />
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+
+  const handleLogin = (userData, jwtToken) => {
+    setUser(userData);
+    setToken(jwtToken);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+  };
+
+  useEffect(() => {
+    setLogoutCallback(handleLogout);
+  }, []);
+
+  const handleProfileUpdate = (updatedUser) => {
+    setUser(prev => ({ ...prev, ...updatedUser }));
+  };
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/loginAdmin" element={
+          user ? <Navigate to="/admin" replace /> : <Login onLogin={handleLogin} />
+        } />
+        
+        <Route path="/admin" element={
+          <ProtectedRoute user={user}>
+            <MainLayout isAdmin={true} user={user} token={token} onLogout={handleLogout} onProfileUpdate={handleProfileUpdate} />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/" element={
+          <MainLayout isAdmin={false} user={null} token={null} onLogout={handleLogout} onProfileUpdate={() => {}} />
+        } />
+      </Routes>
+    </Router>
   );
 }

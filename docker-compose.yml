@@ -1,0 +1,27 @@
+services:
+  cassandra:
+    image: cassandra:5.0
+    container_name: cassandra-ft
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=FTAnnounceCluster
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=100M
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - ftannounce-net
+
+volumes:
+  cassandra_data:
+
+networks:
+  ftannounce-net:
+    driver: bridge
