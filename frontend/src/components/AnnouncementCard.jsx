@@ -9,17 +9,17 @@ import {
 const priorityConfig = {
   darurat: {
     label: "Darurat",
-    className: "bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/30 shadow-sm",
+    className: "text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
     icon: AlertTriangle,
   },
   penting: {
     label: "Penting",
-    className: "bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30 shadow-sm",
+    className: "text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800",
     icon: Bell,
   },
   info: {
     label: "Informasi",
-    className: "bg-sky-50 dark:bg-sky-500/15 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-500/30 shadow-sm",
+    className: "text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800",
     icon: Info,
   },
 };
@@ -41,7 +41,7 @@ function isPinActive(pinUntil) {
   return new Date(pinUntil) > new Date();
 }
 
-export default function AnnouncementCard({ announcement, compact = false }) {
+export default function AnnouncementCard({ announcement, compact = false, onClick }) {
   const {
     author,
     authorRole,
@@ -72,7 +72,7 @@ export default function AnnouncementCard({ announcement, compact = false }) {
   }
 
   return (
-    <article className={`glass-card rounded-[24px] p-5 apple-spring hover:shadow-lg animate-slide-up group ${pinned ? 'border-l-4 border-l-navy-500 dark:border-l-navy-400' : ''}`}>
+    <article onClick={onClick} className={`bg-white dark:bg-navy-800 rounded-xl p-5 border border-slate-200 dark:border-navy-700 hover:border-slate-300 dark:hover:border-navy-600 hover:shadow-md active:scale-[0.99] transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 ${onClick ? "cursor-pointer" : ""} ${pinned ? "border-l-4 border-l-navy-500 dark:border-l-navy-400" : ""}`}>
       {/* Pin indicator */}
       {pinned && (
         <div className="flex items-center gap-1.5 mb-3 text-[11px] text-navy-500 dark:text-navy-400 font-semibold">
@@ -149,3 +149,5 @@ export default function AnnouncementCard({ announcement, compact = false }) {
     </article>
   );
 }
+
+

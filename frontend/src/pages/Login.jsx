@@ -1,105 +1,100 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Mail, Lock, ArrowLeft } from "lucide-react";
-import logo from "../assets/logo.png";
+import { LogIn } from "lucide-react";
 import { loginAdmin } from "../api";
+import useAppStore from "../store/useAppStore";
+import toast from "react-hot-toast";
 
-export default function Login({ onLogin }) {
-  const navigate = useNavigate();
+export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { setUser, setToken } = useAppStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
-
-    const username = e.target.email.value.trim();
-    const password = e.target.password.value;
-
     try {
-      const { token, user } = await loginAdmin(username, password);
-      onLogin({
-        role: user.role,
-        name: user.displayName,
-        username: user.username,
-        accountType: user.accountType,
-        roleTitle: user.roleTitle || null,
-        profilePicture: user.profilePicture || null,
-      }, token);
-      navigate('/admin');
+      const res = await loginAdmin(username, password);
+      setUser(res.user);
+      setToken(res.token);
+      toast.success("Login berhasil!");
+      navigate("/");
     } catch (err) {
-      const msg = err.response?.data?.error || "Gagal menghubungi server. Cek apakah backend berjalan.";
-      setError(msg);
+      toast.error(err.response?.data?.error || "Gagal login. Periksa username dan password.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="h-full overflow-y-auto flex items-center justify-center p-4 relative overflow-x-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-navy-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob"></div>
-      <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-emerald-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-[-10%] left-[20%] w-96 h-96 bg-navy-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-4000"></div>
-
-      <div className="w-full max-w-md glass-strong rounded-[2rem] p-8 md:p-10 shadow-glass relative z-10 border border-glass">
-        <div className="flex flex-col items-center mb-8 relative">
-          <button 
-            type="button"
-            onClick={() => navigate("/")}
-            className="absolute left-0 top-0 p-2 text-tertiary hover:text-primary transition-colors"
-            title="Kembali ke Beranda"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <img src={logo} alt="FTAnnounce Logo" className="w-20 h-20 object-contain drop-shadow-md mb-4" />
-          <h1 className="text-2xl font-bold text-primary tracking-tight">Admin Portal</h1>
-          <p className="text-sm text-secondary mt-1">Sistem Informasi Pengumuman</p>
+    <div className="min-h-screen bg-slate-50 dark:bg-navy-900 flex items-center justify-center p-4 border-2 dark:border-navy-600">
+      <div className="max-w-md w-full glass-card p-8 rounded-2xl shadow-xl border border-white/50 animate-in zoom-in-95 duration-300 hover:shadow-2xl transition-all">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-navy-100 mb-4 dark:bg-navy-800">
+            <LogIn size={32} className="text-navy-700 dark:text-navy-200" />
+          </div>
+          <h1 className="text-2xl font-bold text-navy-900 dark:text-white">Admin Login</h1>
+          <p className="text-navy-600 mt-2 text-sm dark:text-navy-300">
+            Masuk untuk mengelola pengumuman FTAnnounce
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-primary ml-1">Email UI / Username</label>
-            <div className="relative">
-              <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
-              <input
-                type="text"
-                name="email"
-                placeholder="npm@ui.ac.id atau 'admin'"
-                required
-                className="w-full h-11 pl-10 pr-4 rounded-xl glass-input text-sm text-primary placeholder-tertiary focus:outline-none transition-all"
-              />
-            </div>
-            <p className="text-[10px] text-tertiary ml-1">Masukkan username admin yang terdaftar.</p>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-navy-900 dark:text-navy-100 mb-1.5">
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 focus:border-navy-500 focus:ring-2 focus:ring-navy-200 outline-none transition-all dark:bg-navy-800 dark:border-navy-700 dark:text-white dark:focus:ring-navy-700 hover:border-navy-400"
+              placeholder="Masukkan username Anda"
+              required
+            />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-primary ml-1">Password</label>
-            <div className="relative">
-              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
-              <input
-                type="password"
-                name="password"
-                placeholder="••••••••"
-                required
-                className="w-full h-11 pl-10 pr-4 rounded-xl glass-input text-sm text-primary placeholder-tertiary focus:outline-none transition-all"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-navy-900 dark:text-navy-100 mb-1.5">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 focus:border-navy-500 focus:ring-2 focus:ring-navy-200 outline-none transition-all dark:bg-navy-800 dark:border-navy-700 dark:text-white dark:focus:ring-navy-700 hover:border-navy-400"
+              placeholder="********"
+              required
+            />
           </div>
-
-          {error && (
-            <p className="text-xs text-red-500 font-medium text-center px-1">{error}</p>
-          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-11 flex items-center justify-center gap-2 bg-navy-700 hover:bg-navy-800 dark:bg-navy-600 dark:hover:bg-navy-500 text-white rounded-xl font-medium transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-navy-800 hover:bg-navy-900 active:scale-95 group hover:shadow-lg text-white font-medium py-2.5 rounded-xl transition-colors disabled:opacity-70 dark:bg-navy-700 dark:hover:bg-navy-600"
           >
-            {loading ? "Memverifikasi..." : (<>Masuk <ArrowRight size={16} /></>)}
+            {loading ? "Memproses..." : "Masuk ke Dashboard"}
           </button>
         </form>
+
+        <div className="mt-6 pt-6 border-t border-navy-100 text-center dark:border-navy-800">
+          <p className="text-sm text-navy-600 dark:text-navy-400">
+            Bukan akun admin?{" "}
+            <button
+              onClick={() => navigate("/")}
+              className="text-navy-800 font-semibold hover:underline dark:text-navy-200"
+            >
+              Kembali ke Beranda
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
 }
+
+
+
+

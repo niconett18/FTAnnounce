@@ -76,6 +76,13 @@
 }
 
 @layer utilities {
+  .dark .bg-texture-pattern {
+    background-color: #0F1A2E;
+    background-image: radial-gradient(rgba(240, 245, 251, 0.06) 1px, transparent 1.5px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
+  }
+
   .apple-spring {
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -205,3 +212,5 @@
   .text-tertiary { color: #8C95A6; }
   .dark .text-tertiary { color: #5A6478; }
 }
+
+

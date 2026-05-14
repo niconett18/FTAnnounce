@@ -1,8 +1,13 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Hash, Search, SlidersHorizontal, X, Sun, Moon, Plus, Pin, ChevronDown } from "lucide-react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 import AnnouncementCard from "./AnnouncementCard";
 import CreatePostModal from "./CreatePostModal";
+import AnnouncementDetailModal from "./AnnouncementDetailModal";
 import { channelCategories } from "../data/channels";
+import { fetchAnnouncements } from "../api";
+import useAppStore from "../store/useAppStore";
 
 const FILTER_OPTIONS = ["Semua", "Darurat", "Penting", "Info"];
 const FILTER_MAP = { "Darurat": "darurat", "Penting": "penting", "Info": "info" };
@@ -12,14 +17,19 @@ function isPinActive(pinUntil) {
   return new Date(pinUntil) > new Date();
 }
 
-export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announcements, loading, hasMore, onLoadMore, isAdmin, user, token, onPostSuccess }) {
+export default function Feed() {
+  const { activeChannel, isDarkMode, setIsDarkMode, user, token } = useAppStore();
+  const isAdmin = !!user;
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("Semua");
   const [showFilters, setShowFilters] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   const mainRef = useRef(null);
+  const { ref: observerTarget, inView } = useInView({ threshold: 0.1 });
 
   const channelLabel = useMemo(() => {
     for (const cat of channelCategories) {
@@ -29,9 +39,32 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
     return activeChannel;
   }, [activeChannel]);
 
-  // Pisahkan pinned dan regular
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading, isError,
+    refetch
+  } = useInfiniteQuery({
+    queryKey: ["announcements", activeChannel],
+    queryFn: ({ pageParam = null }) => fetchAnnouncements(activeChannel, pageParam),
+    getNextPageParam: (lastPage) => lastPage.nextTimestamp || undefined,
+  });
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
+
+  const allAnnouncements = useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap((page) => page.announcements);
+  }, [data]);
+
   const { pinnedAnnouncements, regularAnnouncements } = useMemo(() => {
-    let items = announcements[activeChannel] || [];
+    let items = allAnnouncements;
 
     if (activeFilter !== "Semua") {
       const backendKey = FILTER_MAP[activeFilter];
@@ -52,11 +85,10 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
     const regular = items.filter((a) => !isPinActive(a.pinUntil));
 
     return { pinnedAnnouncements: pinned, regularAnnouncements: regular };
-  }, [activeChannel, activeFilter, searchQuery, announcements]);
+  }, [allAnnouncements, activeFilter, searchQuery]);
 
   const totalCount = pinnedAnnouncements.length + regularAnnouncements.length;
 
-  // Collapse pinned saat scroll
   const handleScroll = useCallback(() => {
     if (mainRef.current) {
       setPinnedCollapsed(mainRef.current.scrollTop > 80);
@@ -66,44 +98,25 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
   useEffect(() => {
     const el = mainRef.current;
     if (el) {
-      el.addEventListener('scroll', handleScroll, { passive: true });
-      return () => el.removeEventListener('scroll', handleScroll);
+      el.addEventListener("scroll", handleScroll, { passive: true });
+      return () => el.removeEventListener("scroll", handleScroll);
     }
   }, [handleScroll]);
 
-  // Reset collapse saat ganti channel
   useEffect(() => {
-    setPinnedCollapsed(false);
+    
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [activeChannel]);
 
-  const observerTarget = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasMore) {
-          onLoadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
-      }
-    };
-  }, [observerTarget, hasMore, onLoadMore]);
-
   const scrollToTop = () => {
     if (mainRef.current) {
-      mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const handlePostSuccess = () => {
+    setShowPostModal(false);
+    refetch(); // Invalidate or refetch current channel data to get the fresh post
   };
 
   return (
@@ -134,18 +147,14 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
               )}
             </div>
 
-            <button onClick={toggleDarkMode}
+            <button onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-2 text-secondary hover:text-primary hover:bg-navy-100/50 dark:hover:bg-white/10 rounded-full apple-spring active:scale-90"
               title="Toggle Theme">
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
             <button onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 rounded-lg transition-all duration-150 ${
-                showFilters
-                  ? "bg-navy-700 dark:bg-navy-500 text-white shadow-glass"
-                  : "text-tertiary hover:text-primary hover:bg-navy-100/50 dark:hover:bg-white/10"
-              }`}>
+              className={`p-2 rounded-lg transition-all duration-150 ${showFilters ? "bg-navy-700 dark:bg-navy-500 text-white shadow-glass" : "text-tertiary hover:text-primary hover:bg-navy-100/50 dark:hover:bg-white/10"}`}>
               <SlidersHorizontal size={15} strokeWidth={2} />
             </button>
           </div>
@@ -162,11 +171,7 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
             <div className="flex p-1 bg-black/5 dark:bg-white/10 rounded-xl w-full max-w-sm apple-spring">
               {FILTER_OPTIONS.map((opt) => (
                 <button key={opt} onClick={() => setActiveFilter(opt)}
-                  className={`flex-1 text-[11px] font-semibold py-1.5 rounded-[8px] apple-spring ${
-                    activeFilter === opt
-                      ? "bg-white dark:bg-navy-700 shadow-sm text-primary"
-                      : "text-tertiary hover:text-secondary"
-                  }`}>
+                  className={`flex-1 text-[11px] font-semibold py-1.5 rounded-[8px] apple-spring ${activeFilter === opt ? "bg-white dark:bg-navy-700 shadow-sm text-primary" : "text-tertiary hover:text-secondary"}`}>
                   {opt}
                 </button>
               ))}
@@ -175,14 +180,28 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
         )}
       </header>
 
-      <main ref={mainRef} className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-4 md:px-6 py-5 space-y-3">
+      <main ref={mainRef} className="flex-1 overflow-y-auto w-full pb-20">
+        {isAdmin && (
+          <div className="w-full flex justify-center py-4 border-b border-glass bg-navy-50/50 dark:bg-navy-900/30">
+            <button
+              onClick={() => setShowPostModal(true)}
+              className="group flex flex-col items-center gap-2 p-6 w-full max-w-sm border-2 border-dashed border-navy-200 dark:border-navy-700 rounded-2xl hover:border-navy-400 dark:hover:border-navy-500 hover:bg-white/50 dark:hover:bg-navy-800/50 transition-all text-secondary hover:text-primary active:scale-95"
+            >
+              <div className="h-12 w-12 rounded-full bg-navy-100 dark:bg-navy-800 flex items-center justify-center group-hover:bg-navy-200 dark:group-hover:bg-navy-700 transition-colors">
+                <Plus size={24} />
+              </div>
+              <div className="text-center">
+                <p className="text-[14px] font-semibold">Buat Pengumuman Baru</p>
+                <p className="text-[11px] text-tertiary mt-1">Masukkan informasi ke channel {channelLabel}</p>
+              </div>
+            </button>
+          </div>
+        )}
 
-          {/* === PINNED SECTION === */}
+        <div className="max-w-3xl mx-auto px-4 md:px-6 py-5 space-y-3">
           {pinnedAnnouncements.length > 0 && (
             <div className="sticky top-0 z-10">
               {pinnedCollapsed ? (
-                /* Collapsed: hanya judul */
                 <div className="glass-strong rounded-2xl border border-glass shadow-sm p-1 mb-2 cursor-pointer" onClick={scrollToTop}>
                   <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] text-navy-500 dark:text-navy-400 font-semibold">
                     <Pin size={11} />
@@ -194,18 +213,21 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
                   ))}
                 </div>
               ) : (
-                /* Expanded: full cards */
                 <div className="space-y-3 mb-4">
                   {pinnedAnnouncements.map((a) => (
-                    <AnnouncementCard key={a.id} announcement={a} />
+                    <AnnouncementCard key={a.id} announcement={a} onClick={() => setSelectedAnnouncement(a)} />
                   ))}
                 </div>
               )}
             </div>
           )}
 
-          {/* === REGULAR FEED === */}
-          {loading && !announcements[activeChannel]?.length ? (
+          {isError ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <p className="text-[14px] font-medium text-red-500 mb-1">Gagal memuat pengumuman</p>
+              <p className="text-[12px] text-tertiary">Server backend tidak dapat dihubungi. Coba lagi nanti.</p>
+            </div>
+          ) : isLoading ? (
             [1, 2, 3].map(i => (
               <div key={i} className="glass-card rounded-[24px] p-5 animate-pulse">
                 <div className="flex items-center gap-3 mb-3">
@@ -222,7 +244,7 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
             ))
           ) : regularAnnouncements.length > 0 ? (
             regularAnnouncements.map((a) => (
-              <AnnouncementCard key={a.id} announcement={a} />
+              <AnnouncementCard key={a.id} announcement={a} onClick={() => setSelectedAnnouncement(a)} />
             ))
           ) : pinnedAnnouncements.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -236,15 +258,13 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
             </div>
           ) : null}
 
-          {hasMore && (
-            <div ref={observerTarget} className="h-10 flex items-center justify-center">
-              {loading && <div className="w-5 h-5 rounded-full border-2 border-navy-500 border-t-transparent animate-spin"></div>}
-            </div>
-          )}
+          <div ref={observerTarget} className="h-10 flex items-center justify-center mt-2">
+            {isFetchingNextPage && <div className="w-5 h-5 rounded-full border-2 border-navy-500 border-t-transparent animate-spin"></div>}
+            {!hasNextPage && !isLoading && allAnnouncements.length > 0 && <span className="text-[11px] text-tertiary font-medium">Batas akhir pengumuman</span>}
+          </div>
         </div>
       </main>
 
-      {/* FAB */}
       {isAdmin && (
         <button onClick={() => setShowPostModal(true)}
           className="fixed bottom-6 right-6 w-14 h-14 bg-navy-700 hover:bg-navy-800 dark:bg-navy-500 dark:hover:bg-navy-400 text-white rounded-full shadow-lg flex items-center justify-center transition-all active:scale-90 z-30 hover:shadow-xl"
@@ -253,18 +273,25 @@ export default function Feed({ activeChannel, isDarkMode, toggleDarkMode, announ
         </button>
       )}
 
+      {selectedAnnouncement && (
+        <AnnouncementDetailModal 
+          announcement={selectedAnnouncement} 
+          onClose={() => setSelectedAnnouncement(null)} 
+        />
+      )}
+
       {showPostModal && (
         <CreatePostModal
           channelId={activeChannel}
           user={user}
           token={token}
           onClose={() => setShowPostModal(false)}
-          onPostSuccess={(chId, newPost) => {
-            onPostSuccess(chId, newPost);
-            setShowPostModal(false);
-          }}
+          onPostSuccess={handlePostSuccess}
         />
       )}
     </div>
   );
 }
+
+
+
