@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Mail, Lock, ArrowLeft } from "lucide-react";
+import { ArrowRight, Mail, Lock, ShieldCheck, Globe, Eye, EyeOff } from "lucide-react";
 import logo from "../assets/logo.png";
+import ftuiBg from "../assets/FTUI.jpg";
 import { loginAdmin } from "../api";
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,68 +39,116 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="h-full overflow-y-auto flex items-center justify-center p-4 relative overflow-x-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-navy-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob"></div>
-      <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-emerald-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-[-10%] left-[20%] w-96 h-96 bg-navy-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-4000"></div>
+    <div className="h-full flex flex-col md:flex-row bg-white overflow-hidden">
+      <div className="hidden md:flex md:w-[60%] lg:w-[68%] relative overflow-hidden bg-[#E2E8F0]">
+        <img
+          src={ftuiBg}
+          alt="FT UI Building"
+          className="absolute inset-0 w-full h-full object-cover object-center brightness-[1.02] contrast-[1.1] saturate-[1.1] transition-opacity duration-700"
+          style={{ imageRendering: 'auto' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-tr from-navy-900/60 via-navy-800/20 to-transparent"></div>
 
-      <div className="w-full max-w-md glass-strong rounded-[2rem] p-8 md:p-10 shadow-glass relative z-10 border border-glass">
-        <div className="flex flex-col items-center mb-8 relative">
-          <button 
-            type="button"
-            onClick={() => navigate("/")}
-            className="absolute left-0 top-0 p-2 text-tertiary hover:text-primary transition-colors"
-            title="Kembali ke Beranda"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <img src={logo} alt="FTAnnounce Logo" className="w-20 h-20 object-contain drop-shadow-md mb-4" />
-          <h1 className="text-2xl font-bold text-primary tracking-tight">Admin Portal</h1>
-          <p className="text-sm text-secondary mt-1">Sistem Informasi Pengumuman</p>
+        <div className="absolute bottom-16 left-16 z-10 animate-slide-up">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight leading-[1.1]">
+            Digital Gate for <br />
+            <span className="text-navy-200">FT UI Announcements</span>
+          </h2>
+          <p className="text-white/70 text-[16px] max-w-sm leading-relaxed font-light">
+            Platform komunikasi modern untuk seluruh Departemen dan Program Studi di Fakultas Teknik Universitas Indonesia.
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-primary ml-1">Email UI / Username</label>
-            <div className="relative">
-              <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
-              <input
-                type="text"
-                name="email"
-                placeholder="npm@ui.ac.id atau 'admin'"
-                required
-                className="w-full h-11 pl-10 pr-4 rounded-xl glass-input text-sm text-primary placeholder-tertiary focus:outline-none transition-all"
-              />
+      </div>
+
+      <div className="md:w-[40%] lg:w-[32%] flex flex-col justify-center items-center p-8 lg:p-16 relative bg-white border-l border-slate-100">
+        <div className="absolute top-[-5%] right-[-5%] w-64 h-64 bg-navy-100 rounded-full blur-[80px] opacity-60"></div>
+        <div className="absolute bottom-[-5%] left-[-5%] w-64 h-64 bg-navy-50 rounded-full blur-[80px] opacity-60"></div>
+
+        <div className="w-full max-w-sm space-y-10 relative z-10">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 mb-6">
+              <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
+              <div className="h-6 w-px bg-navy-200"></div>
+              <span className="text-[14px] font-bold text-navy-800 tracking-tight">FTAnnounce</span>
             </div>
-            <p className="text-[10px] text-tertiary ml-1">Masukkan username admin yang terdaftar.</p>
+            <h3 className="text-3xl font-bold text-navy-900 tracking-tight">Welcome back</h3>
+            <p className="text-slate-500 text-[14px]">Masukkan kredensial admin Anda untuk melanjutkan.</p>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-primary ml-1">Password</label>
-            <div className="relative">
-              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
-              <input
-                type="password"
-                name="password"
-                placeholder="••••••••"
-                required
-                className="w-full h-11 pl-10 pr-4 rounded-xl glass-input text-sm text-primary placeholder-tertiary focus:outline-none transition-all"
-              />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-navy-400 uppercase tracking-widest ml-1">Username / Email</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail size={18} className="text-slate-400 group-focus-within:text-navy-600 transition-colors" />
+                </div>
+                <input
+                  type="text"
+                  name="email"
+                  placeholder="admin/email@ui.ac.id"
+                  required
+                  className="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 text-navy-900 text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-navy-400 uppercase tracking-widest ml-1">Password</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock size={18} className="text-slate-400 group-focus-within:text-navy-600 transition-colors" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  required
+                  className="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-12 text-navy-900 text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-500 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-navy-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-[12px] font-medium animate-shake">
+                <ShieldCheck size={14} />
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 bg-navy-700 hover:bg-navy-800 text-white rounded-xl font-bold text-[15px] transition-all shadow-lg shadow-navy-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <>Masuk <ArrowRight size={18} /></>
+              )}
+            </button>
+          </form>
+
+          <div className="pt-10 flex flex-col items-center gap-6">
+            <div className="flex items-center gap-4 text-[12px] text-slate-400 font-medium">
+              <button onClick={() => navigate("/")} className="hover:text-navy-600">Kembali ke Beranda</button>
+              <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+              <button className="hover:text-navy-600">Help Center</button>
+            </div>
+
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-[11px] text-slate-500 font-semibold">
+              <Globe size={12} />
+              <span>FT UI • Indonesia</span>
             </div>
           </div>
-
-          {error && (
-            <p className="text-xs text-red-500 font-medium text-center px-1">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full h-11 flex items-center justify-center gap-2 bg-navy-700 hover:bg-navy-800 dark:bg-navy-600 dark:hover:bg-navy-500 text-white rounded-xl font-medium transition-all shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {loading ? "Memverifikasi..." : (<>Masuk <ArrowRight size={16} /></>)}
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );

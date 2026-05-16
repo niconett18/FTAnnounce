@@ -6,8 +6,9 @@ services:
       - "9042:9042"
     environment:
       - CASSANDRA_CLUSTER_NAME=FTAnnounceCluster
-      - MAX_HEAP_SIZE=512M
-      - HEAP_NEWSIZE=100M
+      - MAX_HEAP_SIZE=1G
+      - HEAP_NEWSIZE=256M
+    mem_limit: 2g
     volumes:
       - cassandra_data:/var/lib/cassandra
     healthcheck:
