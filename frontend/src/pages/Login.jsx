@@ -4,35 +4,27 @@ import { ArrowRight, Mail, Lock, ShieldCheck, Globe, Eye, EyeOff } from "lucide-
 import logo from "../assets/logo.png";
 import ftuiBg from "../assets/FTUI.jpg";
 import { loginAdmin } from "../api";
+import useAppStore from "../store/useAppStore";
+import toast from "react-hot-toast";
 
-export default function Login({ onLogin }) {
-  const navigate = useNavigate();
+export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
-
-    const username = e.target.email.value.trim();
-    const password = e.target.password.value;
-
     try {
-      const { token, user } = await loginAdmin(username, password);
-      onLogin({
-        role: user.role,
-        name: user.displayName,
-        username: user.username,
-        accountType: user.accountType,
-        roleTitle: user.roleTitle || null,
-        profilePicture: user.profilePicture || null,
-      }, token);
-      navigate('/admin');
+      const res = await loginAdmin(username, password);
+      setUser(res.user);
+      setToken(res.token);
+      toast.success("Login berhasil!");
+      navigate("/");
     } catch (err) {
-      const msg = err.response?.data?.error || "Gagal menghubungi server. Cek apakah backend berjalan.";
-      setError(msg);
+      toast.error(err.response?.data?.error || "Gagal login. Periksa username dan password.");
     } finally {
       setLoading(false);
     }
@@ -153,3 +145,7 @@ export default function Login({ onLogin }) {
     </div>
   );
 }
+
+
+
+
