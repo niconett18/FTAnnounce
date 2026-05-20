@@ -8,6 +8,7 @@ import AnnouncementDetailModal from "./AnnouncementDetailModal";
 import { channelCategories } from "../data/channels";
 import { fetchAnnouncements } from "../api";
 import useAppStore from "../store/useAppStore";
+import MagazineLayout from './MagazineLayout';
 
 const FILTER_OPTIONS = ["Semua", "Darurat", "Penting", "Info"];
 const FILTER_MAP = { "Darurat": "darurat", "Penting": "penting", "Info": "info" };
@@ -104,7 +105,6 @@ export default function Feed() {
   }, [handleScroll]);
 
   useEffect(() => {
-    
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [activeChannel]);
 
@@ -118,6 +118,9 @@ export default function Feed() {
     setShowPostModal(false);
     refetch(); // Invalidate or refetch current channel data to get the fresh post
   };
+
+  // TAMBAHAN: Cek nama channel
+  const isMagazineArchive = ['magazine', 'archive', 'gardisun', 'intervoice', 'tb-mechanical', 'civil-rights', 'media'].some(keyword => activeChannel?.toLowerCase().includes(keyword));
 
   return (
     <div className="flex-1 flex flex-col min-w-0 h-full relative">
@@ -187,88 +190,94 @@ export default function Feed() {
       </header>
 
       <main ref={mainRef} className="flex-1 overflow-y-auto w-full pb-20">
-        {isAdmin && (
-          <div className="w-full flex justify-center py-4 border-b border-glass bg-navy-50/50 dark:bg-navy-900/30">
-            <button
-              onClick={() => setShowPostModal(true)}
-              className="group flex flex-col items-center gap-2 p-6 w-full max-w-sm border-2 border-dashed border-navy-200 dark:border-navy-700 rounded-2xl hover:border-navy-400 dark:hover:border-navy-500 hover:bg-white/50 dark:hover:bg-navy-800/50 transition-all text-secondary hover:text-primary active:scale-95"
-            >
-              <div className="h-12 w-12 rounded-full bg-navy-100 dark:bg-navy-800 flex items-center justify-center group-hover:bg-navy-200 dark:group-hover:bg-navy-700 transition-colors">
-                <Plus size={24} />
-              </div>
-              <div className="text-center">
-                <p className="text-[14px] font-semibold">Buat Pengumuman Baru</p>
-                <p className="text-[11px] text-tertiary mt-1">Masukkan informasi ke channel {channelLabel}</p>
-              </div>
-            </button>
-          </div>
-        )}
-
-        <div className="max-w-3xl mx-auto px-4 md:px-6 py-5 space-y-3">
-          {pinnedAnnouncements.length > 0 && (
-            <div className="sticky top-0 z-10">
-              {pinnedCollapsed ? (
-                <div className="glass-strong rounded-2xl border border-glass shadow-sm p-1 mb-2 cursor-pointer" onClick={scrollToTop}>
-                  <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] text-navy-500 dark:text-navy-400 font-semibold">
-                    <Pin size={11} />
-                    <span>Disematkan ({pinnedAnnouncements.length})</span>
-                    <ChevronDown size={11} className="ml-auto" />
+        {isMagazineArchive ? (
+          <MagazineLayout channelId={activeChannel} />
+        ) : (
+          <>
+            {isAdmin && (
+              <div className="w-full flex justify-center py-4 border-b border-glass bg-navy-50/50 dark:bg-navy-900/30">
+                <button
+                  onClick={() => setShowPostModal(true)}
+                  className="group flex flex-col items-center gap-2 p-6 w-full max-w-sm border-2 border-dashed border-navy-200 dark:border-navy-700 rounded-2xl hover:border-navy-400 dark:hover:border-navy-500 hover:bg-white/50 dark:hover:bg-navy-800/50 transition-all text-secondary hover:text-primary active:scale-95"
+                >
+                  <div className="h-12 w-12 rounded-full bg-navy-100 dark:bg-navy-800 flex items-center justify-center group-hover:bg-navy-200 dark:group-hover:bg-navy-700 transition-colors">
+                    <Plus size={24} />
                   </div>
-                  {pinnedAnnouncements.map((a) => (
-                    <AnnouncementCard key={a.id} announcement={a} compact={true} />
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-3 mb-4">
-                  {pinnedAnnouncements.map((a) => (
-                    <AnnouncementCard key={a.id} announcement={a} onClick={() => setSelectedAnnouncement(a)} />
-                  ))}
+                  <div className="text-center">
+                    <p className="text-[14px] font-semibold">Buat Pengumuman Baru</p>
+                    <p className="text-[11px] text-tertiary mt-1">Masukkan informasi ke channel {channelLabel}</p>
+                  </div>
+                </button>
+              </div>
+            )}
+
+            <div className="max-w-3xl mx-auto px-4 md:px-6 py-5 space-y-3">
+              {pinnedAnnouncements.length > 0 && (
+                <div className="sticky top-0 z-10">
+                  {pinnedCollapsed ? (
+                    <div className="glass-strong rounded-2xl border border-glass shadow-sm p-1 mb-2 cursor-pointer" onClick={scrollToTop}>
+                      <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] text-navy-500 dark:text-navy-400 font-semibold">
+                        <Pin size={11} />
+                        <span>Disematkan ({pinnedAnnouncements.length})</span>
+                        <ChevronDown size={11} className="ml-auto" />
+                      </div>
+                      {pinnedAnnouncements.map((a) => (
+                        <AnnouncementCard key={a.id} announcement={a} compact={true} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-3 mb-4">
+                      {pinnedAnnouncements.map((a) => (
+                        <AnnouncementCard key={a.id} announcement={a} onClick={() => setSelectedAnnouncement(a)} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {isError ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className="text-[14px] font-medium text-red-500 mb-1">Gagal memuat pengumuman</p>
-              <p className="text-[12px] text-tertiary">Server backend tidak dapat dihubungi. Coba lagi nanti.</p>
-            </div>
-          ) : isLoading ? (
-            [1, 2, 3].map(i => (
-              <div key={i} className="glass-card rounded-[24px] p-5 animate-pulse">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-full bg-navy-100 dark:bg-navy-700" />
-                  <div className="space-y-1.5 flex-1">
-                    <div className="h-3 bg-navy-100 dark:bg-navy-700 rounded w-1/3" />
-                    <div className="h-2 bg-navy-100 dark:bg-navy-700 rounded w-1/4" />
-                  </div>
+              {isError ? (
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <p className="text-[14px] font-medium text-red-500 mb-1">Gagal memuat pengumuman</p>
+                  <p className="text-[12px] text-tertiary">Server backend tidak dapat dihubungi. Coba lagi nanti.</p>
                 </div>
-                <div className="h-4 bg-navy-100 dark:bg-navy-700 rounded w-2/3 mb-2" />
-                <div className="h-3 bg-navy-100 dark:bg-navy-700 rounded w-full mb-1" />
-                <div className="h-3 bg-navy-100 dark:bg-navy-700 rounded w-4/5" />
-              </div>
-            ))
-          ) : regularAnnouncements.length > 0 ? (
-            regularAnnouncements.map((a) => (
-              <AnnouncementCard key={a.id} announcement={a} onClick={() => setSelectedAnnouncement(a)} />
-            ))
-          ) : pinnedAnnouncements.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="w-16 h-16 rounded-2xl glass-card flex items-center justify-center mb-4">
-                <Search size={22} strokeWidth={1.5} className="text-tertiary" />
-              </div>
-              <p className="text-[14px] font-medium text-secondary mb-1">Tidak ada pengumuman</p>
-              <p className="text-[12px] text-tertiary max-w-xs">
-                {searchQuery ? `Tidak ditemukan hasil untuk "${searchQuery}"` : "Belum ada pengumuman di channel ini."}
-              </p>
-            </div>
-          ) : null}
+              ) : isLoading ? (
+                [1, 2, 3].map(i => (
+                  <div key={i} className="glass-card rounded-[24px] p-5 animate-pulse">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-full bg-navy-100 dark:bg-navy-700" />
+                      <div className="space-y-1.5 flex-1">
+                        <div className="h-3 bg-navy-100 dark:bg-navy-700 rounded w-1/3" />
+                        <div className="h-2 bg-navy-100 dark:bg-navy-700 rounded w-1/4" />
+                      </div>
+                    </div>
+                    <div className="h-4 bg-navy-100 dark:bg-navy-700 rounded w-2/3 mb-2" />
+                    <div className="h-3 bg-navy-100 dark:bg-navy-700 rounded w-full mb-1" />
+                    <div className="h-3 bg-navy-100 dark:bg-navy-700 rounded w-4/5" />
+                  </div>
+                ))
+              ) : regularAnnouncements.length > 0 ? (
+                regularAnnouncements.map((a) => (
+                  <AnnouncementCard key={a.id} announcement={a} onClick={() => setSelectedAnnouncement(a)} />
+                ))
+              ) : pinnedAnnouncements.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="w-16 h-16 rounded-2xl glass-card flex items-center justify-center mb-4">
+                    <Search size={22} strokeWidth={1.5} className="text-tertiary" />
+                  </div>
+                  <p className="text-[14px] font-medium text-secondary mb-1">Tidak ada pengumuman</p>
+                  <p className="text-[12px] text-tertiary max-w-xs">
+                    {searchQuery ? `Tidak ditemukan hasil untuk "${searchQuery}"` : "Belum ada pengumuman di channel ini."}
+                  </p>
+                </div>
+              ) : null}
 
-          <div ref={observerTarget} className="h-10 flex items-center justify-center mt-2">
-            {isFetchingNextPage && <div className="w-5 h-5 rounded-full border-2 border-navy-500 border-t-transparent animate-spin"></div>}
-            {!hasNextPage && !isLoading && allAnnouncements.length > 0 && <span className="text-[11px] text-tertiary font-medium">Batas akhir pengumuman</span>}
-          </div>
-        </div>
+              <div ref={observerTarget} className="h-10 flex items-center justify-center mt-2">
+                {isFetchingNextPage && <div className="w-5 h-5 rounded-full border-2 border-navy-500 border-t-transparent animate-spin"></div>}
+                {!hasNextPage && !isLoading && allAnnouncements.length > 0 && <span className="text-[11px] text-tertiary font-medium">Batas akhir pengumuman</span>}
+              </div>
+            </div>
+          </>
+        )}
       </main>
 
       {isAdmin && (
@@ -298,6 +307,3 @@ export default function Feed() {
     </div>
   );
 }
-
-
-
