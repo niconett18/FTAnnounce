@@ -128,7 +128,7 @@ export default function Feed() {
             <h2 className="text-[15px] font-semibold text-primary tracking-[-0.01em] truncate">
               {channelLabel}
             </h2>
-            <span className="hidden sm:inline-flex items-center h-5 px-2 text-[11px] text-tertiary bg-navy-100/50 dark:bg-navy-700/50 rounded-full font-medium tabular-nums">
+            <span className="hidden sm:inline-flex items-center h-5 px-2 text-[11px] text-navy-600 dark:text-navy-100 bg-navy-200/50 dark:bg-navy-500/30 rounded-full font-bold tabular-nums border border-navy-300/30 dark:border-white/10">
               {totalCount}
             </span>
           </div>
@@ -154,7 +154,10 @@ export default function Feed() {
             </button>
 
             <button onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 rounded-lg transition-all duration-150 ${showFilters ? "bg-navy-700 dark:bg-navy-500 text-white shadow-glass" : "text-tertiary hover:text-primary hover:bg-navy-100/50 dark:hover:bg-white/10"}`}>
+              className={`p-2 rounded-lg transition-all duration-150 ${showFilters
+                  ? "bg-navy-700 dark:bg-navy-500 text-white shadow-glass"
+                  : "text-tertiary hover:text-primary hover:bg-navy-100/50 dark:hover:bg-white/10"
+                }`}>
               <SlidersHorizontal size={15} strokeWidth={2} />
             </button>
           </div>
@@ -171,7 +174,10 @@ export default function Feed() {
             <div className="flex p-1 bg-black/5 dark:bg-white/10 rounded-xl w-full max-w-sm apple-spring">
               {FILTER_OPTIONS.map((opt) => (
                 <button key={opt} onClick={() => setActiveFilter(opt)}
-                  className={`flex-1 text-[11px] font-semibold py-1.5 rounded-[8px] apple-spring ${activeFilter === opt ? "bg-white dark:bg-navy-700 shadow-sm text-primary" : "text-tertiary hover:text-secondary"}`}>
+                  className={`flex-1 text-[11px] font-semibold py-1.5 rounded-[8px] apple-spring ${activeFilter === opt
+                      ? "bg-white dark:bg-navy-700 shadow-sm text-primary"
+                      : "text-tertiary hover:text-secondary"
+                    }`}>
                   {opt}
                 </button>
               ))}

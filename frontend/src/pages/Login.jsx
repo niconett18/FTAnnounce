@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogIn } from "lucide-react";
+import { ArrowRight, Mail, Lock, ShieldCheck, Globe, Eye, EyeOff } from "lucide-react";
+import logo from "../assets/logo.png";
+import ftuiBg from "../assets/FTUI.jpg";
 import { loginAdmin } from "../api";
 import useAppStore from "../store/useAppStore";
 import toast from "react-hot-toast";
@@ -9,8 +11,8 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { setUser, setToken } = useAppStore();
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,66 +31,115 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-navy-900 flex items-center justify-center p-4 border-2 dark:border-navy-600">
-      <div className="max-w-md w-full glass-card p-8 rounded-2xl shadow-xl border border-white/50 animate-in zoom-in-95 duration-300 hover:shadow-2xl transition-all">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-navy-100 mb-4 dark:bg-navy-800">
-            <LogIn size={32} className="text-navy-700 dark:text-navy-200" />
-          </div>
-          <h1 className="text-2xl font-bold text-navy-900 dark:text-white">Admin Login</h1>
-          <p className="text-navy-600 mt-2 text-sm dark:text-navy-300">
-            Masuk untuk mengelola pengumuman FTAnnounce
+    <div className="h-full flex flex-col md:flex-row bg-white overflow-hidden">
+      <div className="hidden md:flex md:w-[60%] lg:w-[68%] relative overflow-hidden bg-[#E2E8F0]">
+        <img
+          src={ftuiBg}
+          alt="FT UI Building"
+          className="absolute inset-0 w-full h-full object-cover object-center brightness-[1.02] contrast-[1.1] saturate-[1.1] transition-opacity duration-700"
+          style={{ imageRendering: 'auto' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-tr from-navy-900/60 via-navy-800/20 to-transparent"></div>
+
+        <div className="absolute bottom-16 left-16 z-10 animate-slide-up">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight leading-[1.1]">
+            Digital Gate for <br />
+            <span className="text-navy-200">FT UI Announcements</span>
+          </h2>
+          <p className="text-white/70 text-[16px] max-w-sm leading-relaxed font-light">
+            Platform komunikasi modern untuk seluruh Departemen dan Program Studi di Fakultas Teknik Universitas Indonesia.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-navy-900 dark:text-navy-100 mb-1.5">
-              Username
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 focus:border-navy-500 focus:ring-2 focus:ring-navy-200 outline-none transition-all dark:bg-navy-800 dark:border-navy-700 dark:text-white dark:focus:ring-navy-700 hover:border-navy-400"
-              placeholder="Masukkan username Anda"
-              required
-            />
+      </div>
+
+      <div className="md:w-[40%] lg:w-[32%] flex flex-col justify-center items-center p-8 lg:p-16 relative bg-white border-l border-slate-100">
+        <div className="absolute top-[-5%] right-[-5%] w-64 h-64 bg-navy-100 rounded-full blur-[80px] opacity-60"></div>
+        <div className="absolute bottom-[-5%] left-[-5%] w-64 h-64 bg-navy-50 rounded-full blur-[80px] opacity-60"></div>
+
+        <div className="w-full max-w-sm space-y-10 relative z-10">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 mb-6">
+              <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
+              <div className="h-6 w-px bg-navy-200"></div>
+              <span className="text-[14px] font-bold text-navy-800 tracking-tight">FTAnnounce</span>
+            </div>
+            <h3 className="text-3xl font-bold text-navy-900 tracking-tight">Welcome back</h3>
+            <p className="text-slate-500 text-[14px]">Masukkan kredensial admin Anda untuk melanjutkan.</p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-navy-900 dark:text-navy-100 mb-1.5">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 focus:border-navy-500 focus:ring-2 focus:ring-navy-200 outline-none transition-all dark:bg-navy-800 dark:border-navy-700 dark:text-white dark:focus:ring-navy-700 hover:border-navy-400"
-              placeholder="********"
-              required
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-navy-400 uppercase tracking-widest ml-1">Username / Email</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail size={18} className="text-slate-400 group-focus-within:text-navy-600 transition-colors" />
+                </div>
+                <input
+                  type="text"
+                  name="email"
+                  placeholder="admin/email@ui.ac.id"
+                  required
+                  className="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 text-navy-900 text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-500 transition-all"
+                />
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-navy-800 hover:bg-navy-900 active:scale-95 group hover:shadow-lg text-white font-medium py-2.5 rounded-xl transition-colors disabled:opacity-70 dark:bg-navy-700 dark:hover:bg-navy-600"
-          >
-            {loading ? "Memproses..." : "Masuk ke Dashboard"}
-          </button>
-        </form>
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-navy-400 uppercase tracking-widest ml-1">Password</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock size={18} className="text-slate-400 group-focus-within:text-navy-600 transition-colors" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  required
+                  className="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-12 text-navy-900 text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-500 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-navy-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
 
-        <div className="mt-6 pt-6 border-t border-navy-100 text-center dark:border-navy-800">
-          <p className="text-sm text-navy-600 dark:text-navy-400">
-            Bukan akun admin?{" "}
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-[12px] font-medium animate-shake">
+                <ShieldCheck size={14} />
+                {error}
+              </div>
+            )}
+
             <button
-              onClick={() => navigate("/")}
-              className="text-navy-800 font-semibold hover:underline dark:text-navy-200"
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 bg-navy-700 hover:bg-navy-800 text-white rounded-xl font-bold text-[15px] transition-all shadow-lg shadow-navy-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Kembali ke Beranda
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <>Masuk <ArrowRight size={18} /></>
+              )}
             </button>
-          </p>
+          </form>
+
+          <div className="pt-10 flex flex-col items-center gap-6">
+            <div className="flex items-center gap-4 text-[12px] text-slate-400 font-medium">
+              <button onClick={() => navigate("/")} className="hover:text-navy-600">Kembali ke Beranda</button>
+              <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+              <button className="hover:text-navy-600">Help Center</button>
+            </div>
+
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-[11px] text-slate-500 font-semibold">
+              <Globe size={12} />
+              <span>FT UI • Indonesia</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

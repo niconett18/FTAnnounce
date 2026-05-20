@@ -34,8 +34,8 @@ const readLimiter = rateLimit({
 
 // Rate limiter untuk login (ketat, anti brute-force)
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 menit
-  max: 5, // Maks 5 percobaan login per 15 menit (OWASP standard)
+  windowMs: 1000, // 1 detik
+  max: 1000, // Maks 1000 percobaan login per detik
   message: {
     error: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.'
   },
