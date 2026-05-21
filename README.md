@@ -126,6 +126,11 @@ H --> K[Table: admins]
 
 end
 ```
+# Use Case Diagram
+<img width="1190" height="798" alt="image" src="https://github.com/user-attachments/assets/132d11c9-ac8c-4bf6-b873-003b75e0246c" />
+
+# System Flows
+<img width="1064" height="848" alt="image" src="https://github.com/user-attachments/assets/cbe7acc2-bac2-4ce3-98ff-b0acf8156abe" />
 
 ## Database Schema (Cassandra)
 ### Keyspace
