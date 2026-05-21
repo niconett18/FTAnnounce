@@ -42,6 +42,7 @@ export async function fetchAnnouncements(channelId, lastTimestamp = null) {
       content: a.content,
       attachments: a.attachments || [],
       pinUntil: a.pinUntil || null,
+      readCount: a.readCount || 0,
     })),
     nextTimestamp: res.data.nextTimestamp
   };
@@ -71,4 +72,20 @@ export async function updateAdminProfile({ displayName, roleTitle, profilePictur
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return res.data;
+}
+
+// === Tandai pengumuman telah dibaca ===
+export async function markAsRead(announcementId, readerId) {
+  const res = await axios.post(`${BASE_URL}/api/announcements/${announcementId}/read`, { readerId });
+  return res.data;
+}
+
+// === Dapatkan atau buat reader ID untuk perangkat ini ===
+export function getReaderId() {
+  let readerId = localStorage.getItem('ftannounce_reader_id');
+  if (!readerId) {
+    readerId = crypto.randomUUID();
+    localStorage.setItem('ftannounce_reader_id', readerId);
+  }
+  return readerId;
 }

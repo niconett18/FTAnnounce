@@ -9,6 +9,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import useAppStore from "../store/useAppStore";
+import { markAsRead, getReaderId } from "../api";
 
 const priorityConfig = {
   darurat: {
@@ -45,10 +46,18 @@ function isPinActive(pinUntil) {
   return new Date(pinUntil) > new Date();
 }
 
-export default function AnnouncementCard({ announcement, compact = false, onClick }) {
-  const [hasRead, setHasRead] = useState(false);
+export default function AnnouncementCard({ announcement, compact = false, onClick, onRead }) {
   const { user } = useAppStore();
   const isAdmin = !!user;
+
+  const [hasRead, setHasRead] = useState(() => {
+    if (isAdmin) return false;
+    try {
+      const stored = JSON.parse(localStorage.getItem('ftannounce_reads') || '[]');
+      return stored.includes(announcement.id);
+    } catch { return false; }
+  });
+  const [readCount, setReadCount] = useState(announcement.readCount || 0);
 
   const {
     author,
@@ -160,13 +169,25 @@ export default function AnnouncementCard({ announcement, compact = false, onClic
           {isAdmin ? (
             <div className="flex items-center gap-2 text-[12px] text-slate-500 font-medium">
               <Eye size={14} />
-              <span>Dibaca oleh {Math.floor(Math.random() * 50) + 120} Mahasiswa</span>
+              <span>Dibaca oleh {readCount} Mahasiswa</span>
             </div>
           ) : (
             <button
-              onClick={(e) => {
-                e.stopPropagation(); 
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (hasRead) return;
                 setHasRead(true);
+                try {
+                  const readerId = getReaderId();
+                  const result = await markAsRead(announcement.id, readerId);
+                  setReadCount(result.readCount);
+                  const stored = JSON.parse(localStorage.getItem('ftannounce_reads') || '[]');
+                  stored.push(announcement.id);
+                  localStorage.setItem('ftannounce_reads', JSON.stringify(stored));
+                  if (onRead) onRead();
+                } catch (err) {
+                  setHasRead(false);
+                }
               }}
               disabled={hasRead}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold transition-all ${

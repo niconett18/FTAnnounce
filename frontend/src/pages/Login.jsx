@@ -13,6 +13,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { setUser, setToken } = useAppStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +81,8 @@ export default function Login() {
                   type="text"
                   name="email"
                   placeholder="admin/email@ui.ac.id"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                   className="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 text-navy-900 text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-500 transition-all"
                 />
@@ -95,6 +99,8 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-12 text-navy-900 text-[14px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-500 transition-all"
                 />

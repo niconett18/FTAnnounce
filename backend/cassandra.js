@@ -67,6 +67,17 @@ async function initializeDatabase() {
   `);
   console.log('✅ Tabel "admins" siap');
 
+  // Tabel pembacaan pengumuman (unique readers per announcement)
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS announcement_reads (
+      announcement_id UUID,
+      reader_id       TEXT,
+      read_at         TIMESTAMP,
+      PRIMARY KEY (announcement_id, reader_id)
+    )
+  `);
+  console.log('✅ Tabel "announcement_reads" siap');
+
   console.log('🎉 Database fully initialized!');
 }
 

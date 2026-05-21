@@ -99,7 +99,16 @@ router.get('/:channel', readLimiter, async (req, res) => {
 
       const result = await client.execute(query, params, { prepare: true });
       
-      const mapped = result.rows.map(row => ({
+      const readCountPromises = result.rows.map(row =>
+        client.execute(
+          'SELECT COUNT(*) FROM announcement_reads WHERE announcement_id = ?',
+          [row.id],
+          { prepare: true }
+        )
+      );
+      const countResults = await Promise.all(readCountPromises);
+
+      const mapped = result.rows.map((row, i) => ({
         id: row.id.toString(),
         channelId: row.channel_id,
         authorName: row.author_name,
@@ -111,6 +120,7 @@ router.get('/:channel', readLimiter, async (req, res) => {
         attachments: row.attachment_url || [],
         createdAt: row.created_at,
         pinUntil: row.pin_until || null,
+        readCount: countResults[i].rows[0]['count'].toNumber() || 0,
       }));
 
       allAnnouncements = allAnnouncements.concat(mapped);
@@ -238,6 +248,42 @@ router.post('/', authenticate, writeLimiter, async (req, res) => {
       return res.status(503).json({ error: 'Database sedang tidak tersedia. Coba lagi nanti.' });
     }
     res.status(500).json({ error: 'Gagal membuat pengumuman.' });
+  }
+});
+
+// ==========================================
+// POST /api/announcements/:id/read
+// ==========================================
+router.post('/:id/read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { readerId } = req.body;
+
+    if (!readerId) {
+      return res.status(400).json({ error: 'readerId diperlukan.' });
+    }
+
+    const announcementId = types.Uuid.fromString(id);
+
+    await client.execute(
+      `INSERT INTO announcement_reads (announcement_id, reader_id, read_at) VALUES (?, ?, ?)`,
+      [announcementId, readerId, new Date()],
+      { prepare: true }
+    );
+
+    const countResult = await client.execute(
+      'SELECT COUNT(*) FROM announcement_reads WHERE announcement_id = ?',
+      [announcementId],
+      { prepare: true }
+    );
+
+    res.json({ readCount: countResult.rows[0]['count'].toNumber() });
+  } catch (err) {
+    console.error('Mark as read error:', err);
+    if (isCassandraDown(err)) {
+      return res.status(503).json({ error: 'Database sedang tidak tersedia. Coba lagi nanti.' });
+    }
+    res.status(500).json({ error: 'Gagal menandai telah dibaca.' });
   }
 });
 
