@@ -8,7 +8,7 @@ FTAnnounce dikembangkan sebagai platform pengumuman terpusat yang dirancang khus
 
 Proyek ini mengadopsi konsep arsitektural yang terinspirasi dari model penyimpanan pesan Discord, tetapi diterapkan pada ranah diseminasi informasi akademik.
 
-## Ikhtisar Proyek
+## Deskripsi Proyek
 
 FTAnnounce adalah aplikasi web untuk mengelola dan menampilkan pengumuman bagi **Fakultas Teknik**. Backend dibangun menggunakan **Express REST API** yang mengautentikasi pengguna admin melalui **JWT**, kemudian menyimpan dan mengambil data pengumuman dari **Apache Cassandra** (desain wide-column). Frontend menggunakan **React (Vite)** yang menampilkan umpan pengumuman berdasarkan kanal serta menyediakan fitur masuk (login) dan fitur admin/profil.
 
@@ -32,7 +32,7 @@ FTAnnounce mengatasi permasalahan ini dengan menyediakan:
 - Autentikasi admin yang aman beserta fitur penerbitan
 - Penyimpanan data deret waktu yang skalabel menggunakan Apache Cassandra
 
-## Tumpukan Teknologi
+## Tech Stack
 
 - **Frontend**: React (Vite)
 - **Backend**: Node.js + Express
@@ -41,7 +41,7 @@ FTAnnounce mengatasi permasalahan ini dengan menyediakan:
 - **Keamanan**: `helmet`, CORS, pembatasan laju (`express-rate-limit`)
 - **Konfigurasi Lingkungan**: `dotenv`
 
-## Antarmuka Pengguna
+## Frontend
 
 <img width="1682" height="950" alt="image" src="https://github.com/user-attachments/assets/2cbc742b-ad2d-4cae-8600-e1c7ef47e807" />
 
