@@ -4,9 +4,7 @@ import {
   AlertTriangle,
   Info,
   Bell,
-  Pin,
-  Eye,
-  CheckCircle2
+  Pin
 } from "lucide-react";
 import useAppStore from "../store/useAppStore";
 
@@ -46,7 +44,6 @@ function isPinActive(pinUntil) {
 }
 
 export default function AnnouncementCard({ announcement, compact = false, onClick }) {
-  const [hasRead, setHasRead] = useState(false);
   const { user } = useAppStore();
   const isAdmin = !!user;
 
@@ -154,34 +151,6 @@ export default function AnnouncementCard({ announcement, compact = false, onClic
           })}
         </div>
       )}
-      {/* --- PASTE KODE INI DI SINI (TEPAT DI BAWAH ATTACHMENT DAN DI ATAS </article>) --- */}
-      {!compact && (priority === 'darurat' || priority === 'penting') && (
-        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-          {isAdmin ? (
-            <div className="flex items-center gap-2 text-[12px] text-slate-500 font-medium">
-              <Eye size={14} />
-              <span>Dibaca oleh {Math.floor(Math.random() * 50) + 120} Mahasiswa</span>
-            </div>
-          ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); 
-                setHasRead(true);
-              }}
-              disabled={hasRead}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-bold transition-all ${
-                hasRead
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 cursor-default'
-                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400'
-              }`}
-            >
-              <CheckCircle2 size={14} />
-              {hasRead ? 'Telah Dibaca' : 'Tandai Telah Dibaca'}
-            </button>
-          )}
-        </div>
-      )}
-      {/* -------------------------------------------------------------------------------- */}
     </article>
   );
 }

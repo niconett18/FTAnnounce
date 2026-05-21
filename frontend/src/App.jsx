@@ -58,6 +58,7 @@ export default function App() {
   useEffect(() => {
     setLogoutCallback(() => {
       logout();
+      window.location.href = '/loginAdmin';
     });
   }, [logout]);
 
