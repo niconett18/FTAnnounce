@@ -38,6 +38,10 @@ FTAnnounce addresses these problems by providing:
 - **Security**: `helmet`, CORS, rate limiting (`express-rate-limit`)
 - **Environment/Config**: `dotenv`
 
+# User Interfaces
+<img width="1682" height="950" alt="image" src="https://github.com/user-attachments/assets/2cbc742b-ad2d-4cae-8600-e1c7ef47e807" />
+
+
 ## Core Features
 
 ### Channel-Based Announcement Feed
