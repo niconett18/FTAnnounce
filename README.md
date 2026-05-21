@@ -1,108 +1,121 @@
 # FTAnnounce
 
-## Background
+## Latar Belakang
 
-In many university environments, important announcements are distributed through fragmented communication channels such as LINE groups, WhatsApp groups, email threads, and physical bulletin boards. As the number of announcements grows, students often struggle to revisit older information because announcements become buried beneath casual conversations and unrelated messages.
+Di lingkungan universitas, pengumuman penting sering kali tersebar melalui berbagai kanal komunikasi yang terfragmentasi, seperti grup LINE, grup WhatsApp, utas surel, dan papan pengumuman fisik. Seiring bertambahnya jumlah pengumuman, mahasiswa kerap kesulitan untuk menemukan kembali informasi lama karena pengumuman sudah tertimbun oleh percakapan santai dan pesan-pesan yang tidak relevan.
 
-FTAnnounce was developed as a centralized announcement platform specifically designed for Fakultas Teknik Universitas Indonesia. The system organizes announcements into dedicated channels based on departments and categories, allowing students to efficiently browse chronological announcement histories while enabling administrators to publish structured and prioritized information.
+FTAnnounce dikembangkan sebagai platform pengumuman terpusat yang dirancang khusus untuk Fakultas Teknik Universitas Indonesia. Sistem ini mengelompokkan pengumuman ke dalam kanal-kanal berdasarkan departemen dan kategori, sehingga mahasiswa dapat menelusuri riwayat pengumuman secara kronologis dengan efisien, sementara administrator dapat menerbitkan informasi yang terstruktur dan terprioritaskan.
 
-The project adopts architectural concepts inspired by Discord's message storage model, but applies them to an academic information dissemination domain.
+Proyek ini mengadopsi konsep arsitektural yang terinspirasi dari model penyimpanan pesan Discord, tetapi diterapkan pada ranah diseminasi informasi akademik.
 
-## Project Overview
-FTAnnounce is a web application for managing and viewing announcements for **Fakultas Teknik**. The backend is an **Express REST API** that authenticates admin users using **JWT**, then stores and retrieves announcement data from **Apache Cassandra** (wide-column design). The frontend is a **React (Vite)** application that displays announcement feeds by channel and provides login + admin/profile features.
+## Ikhtisar Proyek
 
-## Problem Statement
+FTAnnounce adalah aplikasi web untuk mengelola dan menampilkan pengumuman bagi **Fakultas Teknik**. Backend dibangun menggunakan **Express REST API** yang mengautentikasi pengguna admin melalui **JWT**, kemudian menyimpan dan mengambil data pengumuman dari **Apache Cassandra** (desain wide-column). Frontend menggunakan **React (Vite)** yang menampilkan umpan pengumuman berdasarkan kanal serta menyediakan fitur masuk (login) dan fitur admin/profil.
 
-Current announcement distribution methods in university environments suffer from several major issues:
+## Rumusan Masalah
 
-- Important academic information is scattered across multiple platforms.
-- Students frequently miss announcements due to message flooding.
-- There is no centralized archive for historical announcements.
-- Information retrieval becomes inefficient over time.
-- Cross-department announcements are difficult to discover.
-- Existing messaging platforms are not optimized for structured academic communication.
+Metode distribusi pengumuman yang saat ini digunakan di lingkungan universitas memiliki beberapa permasalahan utama:
 
-FTAnnounce addresses these problems by providing:
-- Channel-based announcement organization
-- Chronological announcement feeds
-- Priority-based announcement classification
-- Centralized announcement history
-- Secure admin authentication and publishing
-- Scalable time-series data storage using Apache Cassandra
+- Informasi akademik penting tersebar di berbagai platform.
+- Mahasiswa sering melewatkan pengumuman akibat banjir pesan.
+- Tidak ada arsip terpusat untuk riwayat pengumuman.
+- Pencarian informasi menjadi tidak efisien seiring waktu.
+- Pengumuman lintas departemen sulit ditemukan.
+- Platform perpesanan yang ada tidak dioptimalkan untuk komunikasi akademik yang terstruktur.
 
-## Tech Stack
+FTAnnounce mengatasi permasalahan ini dengan menyediakan:
+
+- Organisasi pengumuman berbasis kanal
+- Umpan pengumuman kronologis
+- Klasifikasi pengumuman berdasarkan prioritas
+- Riwayat pengumuman terpusat
+- Autentikasi admin yang aman beserta fitur penerbitan
+- Penyimpanan data deret waktu yang skalabel menggunakan Apache Cassandra
+
+## Tumpukan Teknologi
+
 - **Frontend**: React (Vite)
 - **Backend**: Node.js + Express
-- **Database**: Apache Cassandra (wide-column store)
-- **Auth**: JWT (`jsonwebtoken`) + password hashing (`bcryptjs`)
-- **Security**: `helmet`, CORS, rate limiting (`express-rate-limit`)
-- **Environment/Config**: `dotenv`
+- **Basis Data**: Apache Cassandra (wide-column store)
+- **Autentikasi**: JWT (`jsonwebtoken`) + hashing kata sandi (`bcryptjs`)
+- **Keamanan**: `helmet`, CORS, pembatasan laju (`express-rate-limit`)
+- **Konfigurasi Lingkungan**: `dotenv`
 
-# User Interfaces
+## Antarmuka Pengguna
+
 <img width="1682" height="950" alt="image" src="https://github.com/user-attachments/assets/2cbc742b-ad2d-4cae-8600-e1c7ef47e807" />
 
+## Fitur Inti
 
-## Core Features
+### Umpan Pengumuman Berbasis Kanal
 
-### Channel-Based Announcement Feed
-Announcements are grouped into dedicated channels such as:
-- Department channels
-- Scholarship information
-- Internship and career opportunities
-- Academic events and seminars
-- Student organizations
+Pengumuman dikelompokkan ke dalam kanal-kanal khusus seperti:
 
-### Priority-Based Announcements
-Each announcement can be categorized by urgency:
-- `urgent`
-- `important`
-- `info`
+- Kanal departemen
+- Informasi beasiswa
+- Peluang magang dan karier
+- Acara akademik dan seminar
+- Organisasi kemahasiswaan
 
-This enables critical announcements to stand out from regular informational posts.
+### Pengumuman Berbasis Prioritas
 
-### JWT Authentication System
-Authorized administrators authenticate using JWT-based login and protected API routes.
+Setiap pengumuman dapat dikategorikan berdasarkan tingkat urgensi:
 
-### Cassandra-Powered Time-Series Feed
-Announcements are stored using a wide-column Cassandra schema optimized for:
-- append-heavy workloads
-- chronological retrieval
-- partition-based scaling
-- low-latency feed queries
+- `urgent` (mendesak)
+- `important` (penting)
+- `info` (informasi)
 
-### Pinned Announcement Logic
-The backend supports temporary pinned announcements with channel-specific limits.
+Hal ini memungkinkan pengumuman kritis untuk lebih menonjol dibandingkan kiriman informasi biasa.
 
-## Why Apache Cassandra?
+### Sistem Autentikasi JWT
 
-FTAnnounce uses Apache Cassandra because the application follows a workload pattern similar to large-scale messaging platforms such as Discord.
+Administrator yang berwenang melakukan autentikasi menggunakan login berbasis JWT dan rute API yang dilindungi.
 
-The system primarily performs:
-- frequent write operations
-- chronological feed retrieval
-- append-only announcement storage
-- predictable query patterns
+### Umpan Deret Waktu Berbasis Cassandra
 
-These characteristics align strongly with Cassandra's wide-column architecture.
+Pengumuman disimpan menggunakan skema Cassandra wide-column yang dioptimalkan untuk:
 
-### Why Wide-Column Store?
+- Beban kerja yang dominan operasi tulis (append-heavy)
+- Pengambilan data secara kronologis
+- Penyimpanan pengumuman secara append-only
+- Kueri umpan dengan latensi rendah
 
-Wide-column databases are highly effective for time-series and feed-based systems because data can be partitioned and clustered according to query access patterns.
+### Logika Pengumuman Tersemat (Pinned)
 
-FTAnnounce uses:
-- `channel_id` + `month_year_bucket` as the partition key
-- `created_at` as the clustering key
+Backend mendukung pengumuman tersemat sementara dengan batas per kanal.
 
-This design enables:
-- efficient retrieval of recent announcements
-- chronological sorting without additional computation
-- scalable partition growth
-- avoidance of expensive JOIN operations
+## Mengapa Apache Cassandra?
 
-The schema follows Cassandra's query-driven design philosophy, where tables are designed based on application query requirements rather than relational normalization principles.
+FTAnnounce menggunakan Apache Cassandra karena aplikasi ini mengikuti pola beban kerja yang serupa dengan platform perpesanan berskala besar seperti Discord.
 
-## System Architecture
-## System Architecture
+Sistem ini utamanya melakukan:
+
+- Operasi tulis yang sering
+- Pengambilan umpan secara kronologis
+- Penyimpanan pengumuman secara append-only
+- Pola kueri yang dapat diprediksi
+
+Karakteristik ini sangat selaras dengan arsitektur wide-column milik Cassandra.
+
+### Mengapa Wide-Column Store?
+
+Basis data wide-column sangat efektif untuk sistem berbasis deret waktu dan umpan karena data dapat dipartisi dan dikelompokkan sesuai pola akses kueri.
+
+FTAnnounce menggunakan:
+
+- `channel_id` + `month_year_bucket` sebagai kunci partisi
+- `created_at` sebagai kunci klaster
+
+Desain ini memungkinkan:
+
+- Pengambilan pengumuman terbaru secara efisien
+- Pengurutan kronologis tanpa komputasi tambahan
+- Pertumbuhan partisi yang skalabel
+- Penghindaran operasi JOIN yang mahal
+
+Skema ini mengikuti filosofi desain berbasis kueri (query-driven) milik Cassandra, di mana tabel dirancang berdasarkan kebutuhan kueri aplikasi, bukan berdasarkan prinsip normalisasi relasional.
+
+## Arsitektur Sistem
 
 ```mermaid
 flowchart TD
@@ -130,19 +143,27 @@ H --> K[Table: admins]
 
 end
 ```
-# Use Case Diagram
+
+
+## Diagram Kasus Penggunaan
+
 <img width="1190" height="798" alt="image" src="https://github.com/user-attachments/assets/132d11c9-ac8c-4bf6-b873-003b75e0246c" />
 
-# System Flows
+## Alur Sistem
+
 <img width="1064" height="848" alt="image" src="https://github.com/user-attachments/assets/cbe7acc2-bac2-4ce3-98ff-b0acf8156abe" />
 
-## Database Schema (Cassandra)
-### Keyspace
-- `ftannounce`
-  - Replication: SimpleStrategy, replication_factor = 1
+## Skema Basis Data (Cassandra)
 
-### Table: `announcements_by_channel`
-Wide-column / append-only feed design.
+### Keyspace
+
+- `ftannounce`
+  - Replikasi: SimpleStrategy, replication_factor = 1
+
+### Tabel: `announcements_by_channel`
+
+Desain wide-column / umpan append-only.
+
 ```cql
 CREATE TABLE IF NOT EXISTS announcements_by_channel (
   channel_id            TEXT,
@@ -161,8 +182,10 @@ CREATE TABLE IF NOT EXISTS announcements_by_channel (
 ) WITH CLUSTERING ORDER BY (created_at DESC);
 ```
 
-### Table: `admins`
-Stores login credentials + profile data.
+### Tabel: `admins`
+
+Menyimpan kredensial login dan data profil.
+
 ```cql
 CREATE TABLE IF NOT EXISTS admins (
   username         TEXT PRIMARY KEY,
@@ -174,11 +197,11 @@ CREATE TABLE IF NOT EXISTS admins (
 );
 ```
 
-## Query-Driven Data Modeling
+## Pemodelan Data Berbasis Kueri
 
-Unlike relational databases, Cassandra tables are designed around query patterns rather than entity relationships.
+Berbeda dengan basis data relasional, tabel Cassandra dirancang berdasarkan pola kueri, bukan berdasarkan relasi entitas.
 
-FTAnnounce primarily serves the following query:
+FTAnnounce utamanya melayani kueri berikut:
 
 ```cql
 SELECT * FROM announcements_by_channel
@@ -187,110 +210,125 @@ AND month_year_bucket = ?
 LIMIT 20;
 ```
 
-Because this query is highly predictable and repeatedly executed, the schema is optimized specifically for:
-- latest announcement retrieval
-- chronological ordering
-- pagination using timestamps
-- append-heavy writes
+Karena kueri ini sangat dapat diprediksi dan dieksekusi secara berulang, skema dioptimalkan secara khusus untuk:
 
-This eliminates the need for JOIN operations and minimizes query overhead.
+- Pengambilan pengumuman terbaru
+- Pengurutan kronologis
+- Paginasi menggunakan stempel waktu
+- Operasi tulis yang dominan (append-heavy)
 
-## API Endpoints
-### Root / Health
+Hal ini menghilangkan kebutuhan akan operasi JOIN dan meminimalkan beban kueri.
+
+## Endpoint API
+
+### Root / Kesehatan
+
 - `GET /api/health`
-  - Returns service status and timestamp.
+  - Mengembalikan status layanan dan stempel waktu.
 - `GET /`
-  - Returns basic information and endpoint list.
+  - Mengembalikan informasi dasar dan daftar endpoint.
 
-### Authentication
+### Autentikasi
+
 - `POST /api/auth/login`
-  - Rate limited by `loginLimiter`
-  - Request body: 
+  - Dibatasi oleh `loginLimiter`
+  - Badan permintaan:
     - `username`: string
     - `password`: string
-  - Response:
+  - Respons:
     - `token` (JWT)
-    - `user` profile object
+    - Objek profil `user`
 
-### Announcements
+### Pengumuman
+
 - `GET /api/announcements/:channel`
-  - Rate limited by `readLimiter`
-  - Query params:
-    - `last_timestamp` (optional) for pagination (loads older announcements)
-  - Response:
+  - Dibatasi oleh `readLimiter`
+  - Parameter kueri:
+    - `last_timestamp` (opsional) untuk paginasi (memuat pengumuman lebih lama)
+  - Respons:
     - `channel`, `count`, `announcements[]`, `nextTimestamp`
 
 - `POST /api/announcements`
-  - Protected by `authenticate` (JWT)
-  - Rate limited by `writeLimiter`
-  - Request body:
+  - Dilindungi oleh `authenticate` (JWT)
+  - Dibatasi oleh `writeLimiter`
+  - Badan permintaan:
     - `channelId`
     - `title`
     - `content`
-    - `priority` (optional; defaults to `info`)
-    - `attachments` (array or single value; max stored 3)
-    - `pinDuration` (optional; supports limited durations)
-  - Behavior:
-    - Validates `channelId` against whitelist.
-    - Fetches author profile from Cassandra (`admins`).
-    - Enforces max **2 active pinned** announcements per channel.
-    - Inserts announcement into `announcements_by_channel`.
+    - `priority` (opsional; bawaan `info`)
+    - `attachments` (larik atau nilai tunggal; maksimal 3 disimpan)
+    - `pinDuration` (opsional; mendukung durasi terbatas)
+  - Perilaku:
+    - Memvalidasi `channelId` terhadap daftar putih.
+    - Mengambil profil penulis dari Cassandra (`admins`).
+    - Memberlakukan maksimal **2 pengumuman tersemat aktif** per kanal.
+    - Menyisipkan pengumuman ke `announcements_by_channel`.
 
-### Admin/Profile
+### Admin/Profil
+
 - `PUT /api/admin/profile`
-  - Protected by `authenticate` (JWT)
-  - Rate limiting not applied here (only global route protection)
-  - Request body:
-    - `displayName` (optional)
-    - `roleTitle` (optional)
-    - `profilePicture` (optional)
-  - Rules:
-    - `accountType === 'organization'` is forbidden to edit profile.
+  - Dilindungi oleh `authenticate` (JWT)
+  - Pembatasan laju tidak diterapkan di sini (hanya perlindungan rute global)
+  - Badan permintaan:
+    - `displayName` (opsional)
+    - `roleTitle` (opsional)
+    - `profilePicture` (opsional)
+  - Aturan:
+    - `accountType === 'organization'` dilarang mengedit profil.
 
-## Security Features
+## Fitur Keamanan
 
-The backend includes several security protections:
+Backend mencakup beberapa perlindungan keamanan:
 
-- JWT authentication middleware
-- Password hashing using bcrypt
-- Rate limiting for login/read/write operations
-- HTTP security headers using Helmet
-- CORS protection
-- Protected admin-only routes
+- Middleware autentikasi JWT
+- Hashing kata sandi menggunakan bcrypt
+- Pembatasan laju untuk operasi login/baca/tulis
+- Header keamanan HTTP menggunakan Helmet
+- Perlindungan CORS
+- Rute khusus admin yang dilindungi
 
-These mechanisms help prevent unauthorized access, brute-force attacks, and API abuse.
+Mekanisme ini membantu mencegah akses tidak sah, serangan brute-force, dan penyalahgunaan API.
 
-## How to Run
-> Assumes Docker Desktop is installed/running for Cassandra.
+## Cara Menjalankan
 
-### 1) Start Cassandra (Docker)
+> Pastikan Docker Desktop sudah terpasang dan berjalan untuk Cassandra.
+
+### 1) Jalankan Cassandra (Docker)
+
 ```bash
 docker-compose up -d
 ```
 
 ### 2) Backend
+
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-Backend runs on `http://localhost:3001` by default.
 
-### 3) (Optional) Seed Data
-From `backend/`:
+Backend berjalan di `http://localhost:3001` secara bawaan.
+
+### 3) (Opsional) Data Awal (Seed)
+
+Dari direktori `backend/`:
+
 ```bash
 node seed.js
 ```
 
 ### 4) Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Frontend runs on `http://localhost:5173` by default.
 
-## Project Structure
+Frontend berjalan di `http://localhost:5173` secara bawaan.
+
+## Struktur Proyek
+
 ```text
 FTAnnounce/
 ├─ docker-compose.yml
