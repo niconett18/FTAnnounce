@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router();
 const { client } = require('../cassandra');
 const authenticate = require('../middleware/auth');
+const { writeLimiter } = require('../middleware/rateLimit');
 
 function isCassandraDown(err) {
   return err?.name === 'NoHostAvailableError' || err?.message?.includes('Connection timeout') || err?.message?.includes('All host(s) tried');
@@ -15,7 +16,7 @@ function isCassandraDown(err) {
 // PUT /api/admin/profile
 // Edit display_name, role_title, profile_picture (personal only)
 // ==========================================
-router.put('/profile', authenticate, async (req, res) => {
+router.put('/profile', authenticate, writeLimiter, async (req, res) => {
   try {
     const { displayName, roleTitle, profilePicture } = req.body;
 

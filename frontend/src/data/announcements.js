@@ -9,9 +9,6 @@ export const announcements = {
       title: "Perubahan Jadwal UAS Semester Genap 2025/2026",
       content:
         "Diberitahukan kepada seluruh mahasiswa Departemen Teknik Sipil & Lingkungan bahwa terdapat perubahan jadwal Ujian Akhir Semester (UAS) untuk mata kuliah Mekanika Tanah dan Rekayasa Pondasi. Jadwal baru akan dimulai pada tanggal 26 Mei 2026. Silakan cek portal akademik untuk detail lengkap perubahan ruangan dan waktu. Mahasiswa yang memiliki bentrok jadwal wajib menghubungi dosen pengampu masing-masing paling lambat 15 Mei 2026.",
-      readBy: 187,
-      totalStudents: 245,
-      isRead: false,
       attachments: ["Jadwal_UAS_Revisi.pdf"],
     },
     {
@@ -23,9 +20,6 @@ export const announcements = {
       title: "Pengumpulan Tugas Besar Struktur Beton Bertulang",
       content:
         "Deadline pengumpulan Tugas Besar mata kuliah Struktur Beton Bertulang (CE3215) diperpanjang hingga Jumat, 16 Mei 2026, pukul 23:59 WIB. Pengumpulan dilakukan melalui e-learning dan wajib menyertakan laporan dalam format PDF serta file perhitungan SAP2000. Kelompok yang belum mengonfirmasi topik segera menghubungi asisten dosen.",
-      readBy: 134,
-      totalStudents: 180,
-      isRead: true,
       attachments: ["Template_Laporan_TB.docx"],
     },
     {
@@ -37,9 +31,6 @@ export const announcements = {
       title: "Workshop: Perencanaan Struktur Tahan Gempa dengan ETABS",
       content:
         "HMTS mengundang seluruh mahasiswa Teknik Sipil untuk mengikuti workshop \"Perencanaan Struktur Tahan Gempa dengan ETABS\" yang akan dilaksanakan pada Sabtu, 17 Mei 2026, di Lab Komputer Gedung S Lt.3. Workshop ini gratis dan terbuka untuk semua angkatan. Kuota terbatas untuk 40 peserta. Pendaftaran melalui link yang tertera.",
-      readBy: 89,
-      totalStudents: 245,
-      isRead: true,
       attachments: [],
     },
     {
@@ -51,9 +42,6 @@ export const announcements = {
       title: "Jadwal Praktikum Mekanika Fluida — Penggantian Sesi",
       content:
         "Sesi praktikum Mekanika Fluida untuk Kelas B pada hari Rabu, 14 Mei 2026, ditiadakan dikarenakan pemeliharaan peralatan lab. Sesi penggantian akan dilaksanakan pada Sabtu, 17 Mei 2026, pukul 08:00–10:00 WIB di Lab Hidrolika Gedung S Lt.1. Kehadiran wajib dan akan mempengaruhi nilai praktikum.",
-      readBy: 52,
-      totalStudents: 60,
-      isRead: false,
       attachments: [],
     },
     {
@@ -65,9 +53,6 @@ export const announcements = {
       title: "Batas Akhir Pembayaran UKT Semester Genap",
       content:
         "Diberitahukan kepada seluruh mahasiswa Fakultas Teknik bahwa batas akhir pembayaran Uang Kuliah Tunggal (UKT) Semester Genap 2025/2026 adalah 20 Mei 2026. Mahasiswa yang belum melunasi pembayaran akan dikenakan sanksi pembekuan akses portal akademik dan tidak dapat mengikuti UAS. Bagi yang mengalami kesulitan finansial, segera ajukan permohonan keringanan ke bagian kemahasiswaan.",
-      readBy: 210,
-      totalStudents: 245,
-      isRead: true,
       attachments: ["Surat_Edaran_UKT.pdf"],
     },
     {
@@ -79,9 +64,6 @@ export const announcements = {
       title: "Rekrutmen Asisten Laboratorium Semester Ganjil 2026/2027",
       content:
         "Departemen Teknik Sipil & Lingkungan membuka rekrutmen Asisten Laboratorium untuk Semester Ganjil 2026/2027. Laboratorium yang membutuhkan asisten: Lab Struktur, Lab Hidrolika, Lab Geoteknik, dan Lab Transportasi. Persyaratan: IPK minimal 3.25, telah lulus mata kuliah terkait dengan nilai minimal B+. Pendaftaran dibuka hingga 30 Mei 2026.",
-      readBy: 76,
-      totalStudents: 245,
-      isRead: false,
       attachments: ["Form_Pendaftaran_Aslab.pdf"],
     },
   ],
@@ -95,9 +77,6 @@ export const announcements = {
       title: "Jadwal Responsi Termodinamika II",
       content:
         "Responsi mata kuliah Termodinamika II akan dilaksanakan pada 19-20 Mei 2026. Mahasiswa wajib membawa kalkulator scientific dan alat tulis. Materi meliputi seluruh bab yang telah diajarkan termasuk siklus daya uap dan refrigerasi.",
-      readBy: 95,
-      totalStudents: 150,
-      isRead: false,
       attachments: [],
     },
   ],
@@ -111,9 +90,6 @@ export const announcements = {
       title: "Perubahan Jadwal Kuliah Sistem Digital",
       content:
         "Perkuliahan Sistem Digital kelas A dan B dipindahkan ke Gedung Baru Lt.4 R.401 mulai minggu depan. Perubahan ini berlaku hingga akhir semester. Mahasiswa dimohon menyesuaikan.",
-      readBy: 120,
-      totalStudents: 200,
-      isRead: false,
       attachments: ["Jadwal_Revisi_TE.pdf"],
     },
   ],
@@ -127,9 +103,6 @@ export const announcements = {
       title: "Kunjungan Industri ke PT Krakatau Steel",
       content:
         "Departemen Metalurgi & Material menyelenggarakan kunjungan industri ke PT Krakatau Steel, Cilegon, pada 24 Mei 2026. Pendaftaran dibuka untuk mahasiswa semester 4 ke atas. Biaya transportasi ditanggung departemen. Kuota 35 peserta.",
-      readBy: 28,
-      totalStudents: 90,
-      isRead: true,
       attachments: [],
     },
   ],
@@ -143,9 +116,6 @@ export const announcements = {
       title: "Review Studio Desain 5 — Jadwal Presentasi",
       content:
         "Presentasi akhir Studio Desain 5 akan dilaksanakan pada 20-21 Mei 2026 di Studio Arsitektur Lt.3. Setiap kelompok wajib menyiapkan maket fisik 1:200 dan poster A1. File digital dikumpulkan H-1 sebelum presentasi.",
-      readBy: 45,
-      totalStudents: 55,
-      isRead: false,
       attachments: ["Panduan_Presentasi_SD5.pdf"],
     },
   ],
@@ -159,9 +129,6 @@ export const announcements = {
       title: "Penutupan Sementara Lab Proses Kimia",
       content:
         "Lab Proses Kimia di Gedung K Lt.2 ditutup sementara mulai 12-16 Mei 2026 untuk perbaikan sistem ventilasi dan instalasi fume hood baru. Seluruh kegiatan praktikum dialihkan ke Lab Simulasi. Jadwal penggantian akan diinformasikan kemudian.",
-      readBy: 88,
-      totalStudents: 110,
-      isRead: false,
       attachments: [],
     },
   ],
@@ -175,9 +142,6 @@ export const announcements = {
       title: "Guest Lecture: Supply Chain Management di Era Digital",
       content:
         "Departemen Teknik Industri mengundang seluruh mahasiswa untuk menghadiri guest lecture dengan tema \"Supply Chain Management di Era Digital\" oleh VP Operations Tokopedia. Acara diadakan Kamis, 15 Mei 2026, pukul 13:00-15:00 di Auditorium FT. Sertifikat diberikan bagi peserta yang hadir penuh.",
-      readBy: 155,
-      totalStudents: 170,
-      isRead: true,
       attachments: [],
     },
   ],
@@ -191,9 +155,6 @@ export const announcements = {
       title: "Beasiswa Bank Indonesia 2026 — Pendaftaran Dibuka",
       content:
         "Bank Indonesia membuka program beasiswa untuk mahasiswa S1 aktif dengan IPK minimal 3.00. Benefit meliputi biaya pendidikan, tunjangan buku, dan program mentoring. Pendaftaran online melalui website resmi BI hingga 31 Mei 2026. Berkas yang diperlukan: transkrip nilai, surat rekomendasi, dan essay motivasi.",
-      readBy: 312,
-      totalStudents: 800,
-      isRead: false,
       attachments: ["Info_Beasiswa_BI_2026.pdf"],
     },
   ],
@@ -207,9 +168,6 @@ export const announcements = {
       title: "Job Fair Fakultas Teknik 2026",
       content:
         "Career Development Center FT mengadakan Job Fair tahunan pada 24-25 Mei 2026 di Gedung Auditorium. Perusahaan yang berpartisipasi: Telkom, PLN, Pertamina, Astra, Tokopedia, GoTo, dan 30+ perusahaan lainnya. Mahasiswa tingkat akhir wajib hadir dengan membawa CV terbaru.",
-      readBy: 445,
-      totalStudents: 800,
-      isRead: true,
       attachments: [],
     },
   ],
