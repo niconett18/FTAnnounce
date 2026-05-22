@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Hash, ChevronDown, ChevronRight, X, Settings, Save, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Hash, ChevronDown, ChevronRight, X, Settings, Save, User, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 import { channelCategories } from "../data/channels";
 import { updateAdminProfile } from "../api";
@@ -7,7 +8,8 @@ import useAppStore from "../store/useAppStore";
 import logo from "../assets/logo.png";
 
 export default function Sidebar() {
-  const { activeChannel, setActiveChannel, sidebarOpen, setSidebarOpen, user, setUser, token } = useAppStore();
+  const navigate = useNavigate();
+  const { activeChannel, setActiveChannel, sidebarOpen, setSidebarOpen, user, setUser, token, logout } = useAppStore();
   
   const [collapsed, setCollapsed] = useState({});
   const [showSettings, setShowSettings] = useState(false);
@@ -193,9 +195,12 @@ export default function Sidebar() {
           </div>
         )}
         {user && !showSettings && (
-           <div className="p-4 border-t border-glass">
+           <div className="p-4 border-t border-glass space-y-1">
             <button onClick={openSettings} className="w-full flex items-center justify-center gap-2 py-2 text-[12px] font-medium text-secondary hover:text-primary transition-colors">
               <Settings size={14} /> Pengaturan Profil
+            </button>
+            <button onClick={() => { logout(); navigate("/"); }} className="w-full flex items-center justify-center gap-2 py-2 text-[12px] font-medium text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+              <LogOut size={14} /> Keluar
             </button>
            </div>
         )}
