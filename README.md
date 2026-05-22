@@ -43,7 +43,8 @@ FTAnnounce mengatasi permasalahan ini dengan menyediakan:
 
 ## Frontend
 
-<img width="1682" height="950" alt="image" src="https://github.com/user-attachments/assets/2cbc742b-ad2d-4cae-8600-e1c7ef47e807" />
+<img width="943" height="530" alt="Screenshot 2026-05-22 211226" src="https://github.com/user-attachments/assets/0fcd7938-d200-459d-bca3-f6e8059713dd" />
+
 
 ## Fitur Inti
 
