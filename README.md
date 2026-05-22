@@ -289,6 +289,20 @@ Backend mencakup beberapa perlindungan keamanan:
 
 Mekanisme ini membantu mencegah akses tidak sah, serangan brute-force, dan penyalahgunaan API.
 
+## Pengujian Performa (Load Testing)
+
+Untuk menguji ketahanan sistem terhadap lonjakan trafik, dilakukan simulasi *load testing* menggunakan `autocannon`. Pengujian menyimulasikan **1000 koneksi bersamaan (concurrent connections)** selama 10 detik.
+
+Hasil pengujian membuktikan bahwa kombinasi Node.js dan Apache Cassandra (tanpa operasi JOIN) mampu memproses data dengan sangat efisien:
+- **Throughput:** Rata-rata mencapai lebih dari **3.430 Requests/Second**.
+- **Latensi:** Rata-rata latensi stabil di angka **~290 ms**.
+
+<img width="744" height="265" alt="Screenshot 2026-05-22 182424" src="https://github.com/user-attachments/assets/928e92fb-e536-434e-b83f-7d89e40037f3" />
+
+
+*(Catatan: Permintaan berlebih yang melampaui kapasitas wajar langsung ditangani dan ditolak oleh Rate Limiter Middleware dengan status HTTP 429, memastikan server tetap hidup dan tidak kehabisan memori akibat serangan trafik).*
+
+
 ## Cara Menjalankan
 
 > Pastikan Docker Desktop sudah terpasang dan berjalan untuk Cassandra.
